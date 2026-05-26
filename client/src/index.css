@@ -1,0 +1,248 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
+@tailwind base; @tailwind components; @tailwind utilities;
+
+:root {
+  --bg: #0c090b;
+  --panel: rgba(255, 255, 255, 0.06);
+  --panel-border: rgba(255, 255, 255, 0.1);
+  --gold: #d8b66a;
+  --gold-soft: #f2d38d;
+  --font-body: 'Manrope', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+html[lang='ar'] { --font-body: 'Cairo', sans-serif; }
+body {
+  @apply text-white;
+  font-family: var(--font-body);
+  background:
+    radial-gradient(circle at top left, rgba(216, 182, 106, 0.16), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(92, 55, 29, 0.22), transparent 36%),
+    linear-gradient(180deg, #120e12 0%, var(--bg) 45%, #0a0809 100%);
+  min-height: 100vh;
+}
+
+#root { min-height: 100vh; }
+.site-shell { min-height: 100vh; }
+.eyebrow {
+  @apply text-sm uppercase tracking-[0.35em];
+  color: var(--gold-soft);
+}
+.premium-card {
+  @apply rounded-[2rem] border shadow-2xl;
+  background: var(--panel);
+  border-color: var(--panel-border);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(18px);
+}
+.input {
+  @apply w-full rounded-[1.25rem] border px-4 py-3 outline-none transition;
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.1);
+  color: white;
+}
+.input::placeholder { color: rgba(255,255,255,0.42); }
+.input:focus { border-color: var(--gold); }
+select.input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: rgba(255,255,255,0.08);
+  color: white;
+}
+select.input option {
+  background: #1f1b1d;
+  color: #ffffff;
+}
+select.input:required:invalid {
+  color: rgba(255,255,255,0.55);
+}
+.btn {
+  @apply inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold transition duration-200;
+}
+.btn-gold {
+  @apply btn;
+  background: linear-gradient(135deg, #f3d9a0, #d8b66a);
+  color: #130f0a;
+}
+.btn-gold:hover { filter: brightness(1.04); }
+.btn-dark {
+  @apply btn border;
+  border-color: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: white;
+}
+.btn-dark:hover { background: rgba(255,255,255,0.1); }
+.nav-link {
+  @apply rounded-full px-4 py-2 text-sm transition;
+  color: rgba(255,255,255,0.72);
+}
+.nav-link:hover, .nav-link-active {
+  background: rgba(255,255,255,0.08);
+  color: white;
+}
+.icon-btn {
+  @apply inline-flex h-10 w-10 items-center justify-center rounded-full border transition;
+  border-color: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+}
+.icon-btn:hover { background: rgba(255,255,255,0.1); }
+.hero-tooth-mark {
+  position: relative;
+  width: 42px;
+  height: 52px;
+  border-radius: 40% 40% 46% 46% / 34% 34% 58% 58%;
+  border: 2px solid rgba(242, 211, 141, 0.9);
+  background: linear-gradient(180deg, rgba(242,211,141,0.16), rgba(242,211,141,0.04));
+  box-shadow: 0 0 18px rgba(242, 211, 141, 0.14);
+}
+.hero-tooth-mark::before,
+.hero-tooth-mark::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  width: 12px;
+  height: 18px;
+  border: 2px solid rgba(242, 211, 141, 0.9);
+  border-top: none;
+  background: rgba(242,211,141,0.05);
+}
+.hero-tooth-mark::before {
+  left: 7px;
+  border-radius: 0 0 10px 8px;
+}
+.hero-tooth-mark::after {
+  right: 7px;
+  border-radius: 0 0 8px 10px;
+}
+.hero-tooth-core {
+  position: absolute;
+  inset: 9px;
+  border-radius: 38%;
+  background: radial-gradient(circle at top, rgba(255,255,255,0.82), rgba(242,211,141,0.18));
+}
+.hero-mini-tooth {
+  position: relative;
+  width: 24px;
+  height: 30px;
+  border-radius: 40% 40% 44% 44% / 30% 30% 58% 58%;
+  border: 2px solid rgba(242, 211, 141, 0.85);
+  background: linear-gradient(180deg, rgba(242,211,141,0.12), rgba(242,211,141,0.03));
+}
+.hero-mini-tooth::before,
+.hero-mini-tooth::after {
+  content: "";
+  position: absolute;
+  bottom: -7px;
+  width: 7px;
+  height: 10px;
+  border: 2px solid rgba(242, 211, 141, 0.85);
+  border-top: none;
+  background: rgba(242,211,141,0.04);
+}
+.hero-mini-tooth::before {
+  left: 4px;
+  border-radius: 0 0 6px 5px;
+}
+.hero-mini-tooth::after {
+  right: 4px;
+  border-radius: 0 0 5px 6px;
+}
+.logo-glow-wrap {
+  position: relative;
+  isolation: isolate;
+}
+.logo-glow-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 1.45rem;
+  background: conic-gradient(
+    from 0deg,
+    rgba(242,211,141,0) 0deg,
+    rgba(242,211,141,0.95) 48deg,
+    rgba(255,255,255,0.2) 78deg,
+    rgba(242,211,141,0) 110deg,
+    rgba(242,211,141,0) 360deg
+  );
+  filter: blur(2px);
+  animation: logoOrbit 3.8s linear infinite;
+  z-index: 0;
+}
+.logo-glow-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 1.25rem;
+  background: linear-gradient(145deg, rgba(20,18,20,0.88), rgba(41,35,33,0.72));
+  z-index: 1;
+}
+@keyframes logoOrbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.hero-card-glow-wrap {
+  position: relative;
+  isolation: isolate;
+}
+.hero-card-glow-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 2.1rem;
+  background: conic-gradient(
+    from 0deg,
+    rgba(242,211,141,0) 0deg,
+    rgba(242,211,141,0.82) 52deg,
+    rgba(255,255,255,0.22) 82deg,
+    rgba(242,211,141,0) 120deg,
+    rgba(242,211,141,0) 360deg
+  );
+  filter: blur(4px);
+  animation: logoOrbit 6s linear infinite;
+  z-index: 0;
+}
+.hero-card-glow-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 2rem;
+  background: linear-gradient(145deg, rgba(20,18,20,0.88), rgba(41,35,33,0.74));
+  z-index: 1;
+}
+.floating-teeth-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+.floating-tooth {
+  position: absolute;
+  color: rgba(242, 211, 141, 0.7);
+  filter: drop-shadow(0 0 16px rgba(242, 211, 141, 0.08));
+  animation-name: floatTooth;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+@keyframes floatTooth {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(8px, -14px, 0) rotate(3deg);
+  }
+  50% {
+    transform: translate3d(-6px, -24px, 0) rotate(-2deg);
+  }
+  75% {
+    transform: translate3d(10px, -10px, 0) rotate(2deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}

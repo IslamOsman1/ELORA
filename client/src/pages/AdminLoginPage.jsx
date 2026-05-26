@@ -1,0 +1,46 @@
+import React from 'react';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { Link, useNavigate } from 'react-router-dom';
+import { api } from '../utils/api';
+import { useLanguage } from '../context/LanguageContext';
+
+export default function AdminLoginPage() {
+  const navigate = useNavigate();
+  const { t } = useLanguage();
+  const [email, setEmail] = useState('admin@elora.com');
+  const [password, setPassword] = useState('Admin@12345');
+  const [loading, setLoading] = useState(false);
+
+  async function submit(event) {
+    event.preventDefault();
+    setLoading(true);
+    try {
+      const response = await api.post('/auth/login', { email: email.trim(), password });
+      localStorage.setItem('elora_token', response.data.token);
+      toast.success('Welcome back');
+      navigate('/admin');
+    } catch (error) {
+      toast.error(error.response?.data?.message || t('admin.errors.server'));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <main className="grid min-h-screen place-items-center px-4 py-10">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(244,213,154,0.2),transparent_32%),radial-gradient(circle_at_bottom,rgba(98,65,35,0.32),transparent_38%)]" />
+      <form onSubmit={submit} className="premium-card relative w-full max-w-lg p-8">
+        <img src="/logo.jpg" alt="ELORA" className="mx-auto h-24 w-24 rounded-3xl object-cover" />
+        <h1 className="mt-6 text-center font-display text-5xl">{t('admin.loginTitle')}</h1>
+        <p className="mt-3 text-center text-white/60">{t('admin.loginText')}</p>
+        <div className="mt-8 grid gap-4">
+          <input className="input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('admin.email')} />
+          <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('admin.password')} />
+          <button className="btn-gold mt-2 w-full" disabled={loading}>{loading ? t('admin.loggingIn') : t('admin.login')}</button>
+          <Link className="text-center text-white/55 transition hover:text-white" to="/">{t('nav.home')}</Link>
+        </div>
+      </form>
+    </main>
+  );
+}
