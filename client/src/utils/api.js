@@ -1,7 +1,23 @@
 import axios from 'axios';
 import { getAdminToken, getCustomerToken } from './auth';
 
-export const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api' });
+function resolveApiBaseUrl() {
+  const configuredUrl = import.meta.env.VITE_API_URL?.trim();
+  if (configuredUrl) return configuredUrl;
+
+  if (typeof window === 'undefined') {
+    return 'http://localhost:5000/api';
+  }
+
+  const { origin, hostname } = window.location;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:5000/api';
+  }
+
+  return `${origin}/api`;
+}
+
+export const api = axios.create({ baseURL: resolveApiBaseUrl() });
 
 api.interceptors.request.use((config) => {
   if (config.headers.Authorization) return config;
