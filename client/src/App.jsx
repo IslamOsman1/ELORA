@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { CustomerAuthProvider } from './context/CustomerAuthContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { NotificationsProvider } from './context/NotificationsContext';
 import { SiteSettingsProvider } from './context/SiteSettingsContext';
 import FloatingTeethBackground from './components/layout/FloatingTeethBackground';
 import SiteLayout from './components/layout/SiteLayout';
@@ -19,6 +20,9 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminQrVerificationPage from './pages/AdminQrVerificationPage';
 import AuthPage from './pages/AuthPage';
 import ProfilePage from './pages/ProfilePage';
+import PatientBookingsPage from './pages/PatientBookingsPage';
+import CaseFollowUpPage from './pages/CaseFollowUpPage';
+import NotificationsPage from './pages/NotificationsPage';
 import { getAdminToken } from './utils/auth';
 
 class AppErrorBoundary extends Component {
@@ -56,43 +60,48 @@ export default function App() {
     <AppErrorBoundary>
       <LanguageProvider>
         <CustomerAuthProvider>
-          <SiteSettingsProvider>
-            <FloatingTeethBackground />
-            <BrowserRouter>
-              <Toaster position="top-center" />
-              <Routes>
-                <Route element={<SiteLayout />}>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/about" element={<AboutPage />} />
-                  <Route path="/services" element={<ServicesPage />} />
-                  <Route path="/services/:serviceId" element={<ServiceDetailsPage />} />
-                  <Route path="/doctors" element={<DoctorsPage />} />
-                  <Route path="/doctors/:doctorId" element={<DoctorDetailsPage />} />
-                  <Route path="/booking" element={<BookingPage />} />
-                  <Route path="/contact" element={<ContactPage />} />
-                  <Route path="/account/auth" element={<AuthPage />} />
-                  <Route path="/account" element={<ProfilePage />} />
-                </Route>
-                <Route path="/admin/login" element={<AdminLoginPage />} />
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute>
-                      <AdminDashboardPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/verify"
-                  element={
-                    <ProtectedRoute>
-                      <AdminQrVerificationPage />
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
-            </BrowserRouter>
-          </SiteSettingsProvider>
+          <NotificationsProvider>
+            <SiteSettingsProvider>
+              <FloatingTeethBackground />
+              <BrowserRouter>
+                <Toaster position="top-center" />
+                <Routes>
+                  <Route element={<SiteLayout />}>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/services" element={<ServicesPage />} />
+                    <Route path="/services/:serviceId" element={<ServiceDetailsPage />} />
+                    <Route path="/doctors" element={<DoctorsPage />} />
+                    <Route path="/doctors/:doctorId" element={<DoctorDetailsPage />} />
+                    <Route path="/booking" element={<BookingPage />} />
+                    <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/account/auth" element={<AuthPage />} />
+                    <Route path="/account" element={<ProfilePage />} />
+                    <Route path="/account/bookings" element={<PatientBookingsPage />} />
+                    <Route path="/account/case-follow-up" element={<CaseFollowUpPage />} />
+                    <Route path="/account/notifications" element={<NotificationsPage />} />
+                  </Route>
+                  <Route path="/admin/login" element={<AdminLoginPage />} />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute>
+                        <AdminDashboardPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/verify"
+                    element={
+                      <ProtectedRoute>
+                        <AdminQrVerificationPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Routes>
+              </BrowserRouter>
+            </SiteSettingsProvider>
+          </NotificationsProvider>
         </CustomerAuthProvider>
       </LanguageProvider>
     </AppErrorBoundary>

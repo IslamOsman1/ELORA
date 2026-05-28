@@ -41,6 +41,7 @@ function normalizeUser(user) {
     id: user._id,
     name: user.name,
     email: user.email,
+    phone: user.phone || '',
     role: user.role,
     avatar: user.avatar || '',
     qrCodeToken: user.qrCodeToken || '',
@@ -280,8 +281,14 @@ router.post('/customer/appointments', protect('customer'), async (req, res) => {
       ...data,
       user: req.user._id,
       patientName: req.user.name,
-      email: req.user.email
+      email: req.user.email,
+      status: 'pending_review'
     });
+
+    if (data.phone && req.user.phone !== data.phone) {
+      req.user.phone = data.phone;
+      await req.user.save();
+    }
 
     res.status(201).json({ message: 'Appointment booked successfully', appointment });
   } catch (error) {
