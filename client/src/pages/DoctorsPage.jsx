@@ -34,12 +34,6 @@ export default function DoctorsPage() {
         <div className="mx-auto hidden max-w-7xl gap-3 sm:gap-6 md:grid md:grid-cols-2 xl:grid-cols-3">
           {doctors.map((doctor) => <DoctorCard key={doctor._id} doctor={doctor} />)}
         </div>
-
-        <div className="mx-auto mt-8 max-w-7xl md:hidden">
-          <div className="rounded-[1.7rem] border border-white/10 bg-white/[0.03] p-4 text-sm leading-7 text-white/60">
-            {isArabic ? 'في الموبايل اضغط على اسم الطبيب لفتح صفحة التفاصيل الكاملة.' : 'On mobile, tap the doctor card to open the full details page.'}
-          </div>
-        </div>
       </section>
     </main>
   );

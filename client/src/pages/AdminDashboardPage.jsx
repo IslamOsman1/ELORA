@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Calendar, CheckCircle2, Clock3, Image, LogOut, MailOpen, PencilLine, ShieldCheck, Stethoscope, Trash2, UserRoundCog, Users } from 'lucide-react';
+import { Calendar, CheckCircle2, ChevronDown, Clock3, Image, LogOut, MailOpen, PencilLine, ShieldCheck, Stethoscope, Trash2, UserRoundCog, Users, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
@@ -33,9 +33,9 @@ const doctorInitial = {
 
 function StatCard({ icon: Icon, label, value }) {
   return (
-    <div className="premium-card p-5">
+    <div className="premium-card min-w-[10.5rem] p-4 sm:min-w-0 sm:p-5">
       <Icon className="text-[#f2d38d]" />
-      <p className="mt-4 text-3xl font-semibold">{value || 0}</p>
+      <p className="mt-3 text-2xl font-semibold sm:mt-4 sm:text-3xl">{value || 0}</p>
       <p className="mt-2 text-sm text-white/55">{label}</p>
     </div>
   );
@@ -43,9 +43,9 @@ function StatCard({ icon: Icon, label, value }) {
 
 function AdminPanel({ title, children }) {
   return (
-    <section className="premium-card p-5">
-      <h2 className="text-2xl font-semibold">{title}</h2>
-      <div className="mt-5">{children}</div>
+    <section className="premium-card p-4 sm:p-5">
+      <h2 className="text-xl font-semibold sm:text-2xl">{title}</h2>
+      <div className="mt-4 sm:mt-5">{children}</div>
     </section>
   );
 }
@@ -69,6 +69,7 @@ export default function AdminDashboardPage() {
   const [editingDoctorId, setEditingDoctorId] = useState('');
   const [serviceImageUploading, setServiceImageUploading] = useState(false);
   const [doctorImageUploading, setDoctorImageUploading] = useState(false);
+  const [mobileTabsOpen, setMobileTabsOpen] = useState(false);
 
   const labels = useMemo(() => ({
     users: t('admin.tabs.users') === 'admin.tabs.users' ? (isArabic ? 'المستخدمون' : 'Users') : t('admin.tabs.users'),
@@ -114,6 +115,11 @@ export default function AdminDashboardPage() {
     if (!nextTabs.some(([key]) => key === 'settings')) nextTabs.push(['settings', labels.settings]);
     return nextTabs;
   }, [labels.settings, labels.users, t]);
+
+  const activeTabLabel = useMemo(
+    () => tabEntries.find(([key]) => key === tab)?.[1] || tab,
+    [tab, tabEntries]
+  );
 
   async function load() {
     const [statsRes, appointmentsRes, messagesRes, servicesRes, doctorsRes, usersRes] = await Promise.all([
@@ -298,17 +304,17 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <main className="min-h-screen px-4 py-8">
+    <main className="min-h-screen px-3 py-4 sm:px-4 sm:py-8">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <div className="mb-6 flex flex-col gap-4 sm:mb-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
             <img src="/logo.jpg" alt="ELORA" className="h-16 w-16 rounded-3xl object-cover" />
             <div>
               <p className="eyebrow !mb-0">{t('admin.dashboard')}</p>
-              <h1 className="mt-2 font-display text-5xl">ELORA</h1>
+              <h1 className="mt-2 font-display text-3xl sm:text-5xl">ELORA</h1>
             </div>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link to="/admin/verify" className="btn-gold inline-flex items-center gap-2">
               <ShieldCheck size={16} />
               {isArabic ? 'التحقق بالكاميرا' : 'Verify with camera'}
@@ -317,14 +323,44 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
+        <div className="scrollbar-hide flex gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible md:pb-0 xl:grid-cols-4 2xl:grid-cols-7">
           {statsCards.map(([Icon, label, value]) => <StatCard key={label} icon={Icon} label={label} value={value} />)}
         </div>
 
-        <div className="my-8 flex flex-wrap gap-3">
+        <div className="my-8 hidden flex-wrap gap-3 md:flex">
           {tabEntries.map(([key, label]) => (
             <button key={key} className={tab === key ? 'btn-gold' : 'btn-dark'} onClick={() => setTab(key)}>{label}</button>
           ))}
+        </div>
+
+        <div className="my-6 md:hidden">
+          <button
+            className="premium-card flex w-full items-center justify-between px-4 py-3 text-start"
+            onClick={() => setMobileTabsOpen((current) => !current)}
+          >
+            <div>
+              <p className="text-xs uppercase tracking-[0.28em] text-white/40">{isArabic ? 'القسم الحالي' : 'Current section'}</p>
+              <p className="mt-2 text-lg font-semibold text-white">{activeTabLabel}</p>
+            </div>
+            {mobileTabsOpen ? <X size={18} /> : <ChevronDown size={18} />}
+          </button>
+
+          {mobileTabsOpen ? (
+            <div className="premium-card mt-3 grid gap-2 p-3">
+              {tabEntries.map(([key, label]) => (
+                <button
+                  key={key}
+                  className={tab === key ? 'btn-gold !justify-start' : 'btn-dark !justify-start'}
+                  onClick={() => {
+                    setTab(key);
+                    setMobileTabsOpen(false);
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         {tab === 'appointments' && (
