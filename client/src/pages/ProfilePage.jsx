@@ -19,11 +19,12 @@ export default function ProfilePage() {
     if (!user?.qrCodeToken) return;
 
     QRCode.toDataURL(`ELORA_USER:${user.qrCodeToken}`, {
-      width: 320,
-      margin: 2,
+      width: 420,
+      margin: 4,
+      errorCorrectionLevel: 'M',
       color: {
-        dark: '#f2d38d',
-        light: '#141012'
+        dark: '#111111',
+        light: '#ffffff'
       }
     }).then(setQrCodeImage).catch(() => setQrCodeImage(''));
   }, [user?.qrCodeToken]);
@@ -112,7 +113,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="mt-6 flex flex-wrap items-center gap-6">
-                <div className="rounded-[1.5rem] border border-white/10 bg-[#141012] p-4">
+                <div className="rounded-[1.5rem] border border-white/10 bg-white p-4 shadow-[0_12px_40px_rgba(0,0,0,0.2)]">
                   {qrCodeImage ? (
                     <img src={qrCodeImage} alt="ELORA QR" className="h-56 w-56 rounded-[1rem]" />
                   ) : (

@@ -14,8 +14,6 @@ export default function AdminQrVerificationPage() {
   const readerRef = useRef(null);
   const controlsRef = useRef(null);
   const streamRef = useRef(null);
-  const scanTimerRef = useRef(null);
-  const barcodeDetectorRef = useRef(null);
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [cameraLoading, setCameraLoading] = useState(false);
   const [availableCameras, setAvailableCameras] = useState([]);
@@ -75,10 +73,6 @@ export default function AdminQrVerificationPage() {
     controlsRef.current?.stop?.();
     controlsRef.current = null;
     readerRef.current?.reset?.();
-    if (scanTimerRef.current) {
-      clearInterval(scanTimerRef.current);
-      scanTimerRef.current = null;
-    }
 
     const stream = streamRef.current || videoRef.current?.srcObject;
     if (stream && typeof stream.getTracks === 'function') {
@@ -142,51 +136,22 @@ export default function AdminQrVerificationPage() {
         await verifyCode(qrText);
       };
 
-      const constraints = preferredDeviceId
-        ? {
-            audio: false,
-            video: {
-              deviceId: { exact: preferredDeviceId },
-              width: { ideal: 1280 },
-              height: { ideal: 720 }
-            }
-          }
-        : {
-            audio: false,
-            video: {
-              facingMode: { ideal: 'environment' },
-              width: { ideal: 1280 },
-              height: { ideal: 720 }
-            }
-          };
+      controlsRef.current = await readerRef.current.decodeFromVideoDevice(preferredDeviceId || undefined, videoRef.current, callback);
+      streamRef.current = videoRef.current.srcObject;
 
-      const NativeBarcodeDetector = globalThis.BarcodeDetector;
-
-      if (NativeBarcodeDetector) {
-        if (!barcodeDetectorRef.current) {
-          barcodeDetectorRef.current = new NativeBarcodeDetector({ formats: ['qr_code'] });
+      const videoTrack = streamRef.current?.getVideoTracks?.()[0];
+      if (videoTrack?.applyConstraints) {
+        try {
+          await videoTrack.applyConstraints({
+            advanced: [
+              { focusMode: 'continuous' },
+              { exposureMode: 'continuous' },
+              { whiteBalanceMode: 'continuous' }
+            ]
+          });
+        } catch (_) {
+          // Some browsers do not support advanced camera controls.
         }
-
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        streamRef.current = stream;
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-
-        scanTimerRef.current = setInterval(async () => {
-          if (!videoRef.current || videoRef.current.readyState < 2 || lookupLoading) return;
-
-          try {
-            const barcodes = await barcodeDetectorRef.current.detect(videoRef.current);
-            const qrCode = barcodes.find((item) => item.rawValue);
-            if (!qrCode?.rawValue) return;
-            stopScanner();
-            await verifyCode(qrCode.rawValue);
-          } catch (_) {
-            // Ignore transient frame read failures while the camera warms up.
-          }
-        }, 250);
-      } else {
-        controlsRef.current = await readerRef.current.decodeFromConstraints(constraints, videoRef.current, callback);
       }
 
       setCameraEnabled(true);
