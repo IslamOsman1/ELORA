@@ -1,19 +1,14 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { ArrowRight, Calendar, CheckCircle2, ShieldCheck, Sparkles, Stethoscope } from 'lucide-react';
+import { Calendar, CheckCircle2, ShieldCheck, Sparkles, Stethoscope } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 import SectionHeading from '../components/common/SectionHeading';
 import ServiceCard from '../components/public/ServiceCard';
 import DoctorCard from '../components/public/DoctorCard';
-
-const showcaseImages = [
-  'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1588776814546-daab30f310ce?auto=format&fit=crop&w=1200&q=80',
-  'https://images.unsplash.com/photo-1571772996211-2f02c9727629?auto=format&fit=crop&w=1200&q=80'
-];
 
 function DentalHeroAnimation() {
   return (
@@ -74,9 +69,23 @@ function DentalHeroAnimation() {
 }
 
 export default function HomePage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { branding, getImage, getText } = useSiteSettings();
   const [services, setServices] = useState([]);
   const [doctors, setDoctors] = useState([]);
+  const showcaseImages = getImage('homeShowcaseImages', [
+    'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1588776814546-daab30f310ce?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1571772996211-2f02c9727629?auto=format&fit=crop&w=1200&q=80'
+  ]);
+  const brandName = branding.brandName || 'ELORA';
+  const brandFull = getText(language, 'common.brandFull', t('common.brandFull'));
+  const homeEyebrow = getText(language, 'home.eyebrow', t('home.eyebrow'));
+  const homeTitle = getText(language, 'home.title', t('home.title'));
+  const homeDescription = getText(language, 'home.description', t('home.description'));
+  const homeFeaturesTitle = getText(language, 'home.featuresTitle', t('home.featuresTitle'));
+  const homeShowcaseText = getText(language, 'home.showcaseText', t('home.showcaseText'));
+  const logoUrl = branding.logoUrl || '/logo.jpg';
 
   useEffect(() => {
     api.get('/services').then((response) => setServices(response.data.slice(0, 3)));
@@ -89,7 +98,7 @@ export default function HomePage() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(244,213,154,0.24),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(96,54,31,0.38),transparent_35%)]" />
         <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center">
           <img
-            src="/logo.jpg"
+            src={logoUrl}
             alt=""
             aria-hidden="true"
             className="h-[180px] w-[180px] rounded-[2.5rem] object-cover opacity-[0.06] blur-[1px] sm:h-[260px] sm:w-[260px] sm:rounded-[3.5rem] lg:h-[420px] lg:w-[420px] lg:rounded-[5rem] lg:opacity-[0.08]"
@@ -104,12 +113,12 @@ export default function HomePage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
                       <div className="logo-glow-wrap overflow-hidden rounded-[1.35rem] border border-[#f2d38d]/18 bg-white/[0.04] p-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.16)]">
-                        <img src="/logo.jpg" alt="ELORA logo" className="relative z-10 h-14 w-14 rounded-[1rem] object-cover" />
+                        <img src={logoUrl} alt={`${brandName} logo`} className="relative z-10 h-14 w-14 rounded-[1rem] object-cover" />
                       </div>
                       <div>
-                        <p className="text-[0.68rem] uppercase tracking-[0.35em] text-[#f2d38d]">ELORA</p>
+                        <p className="text-[0.68rem] uppercase tracking-[0.35em] text-[#f2d38d]">{brandName}</p>
                         <p className="mt-3 max-w-[14rem] font-display text-[1.55rem] leading-[1.08] text-white">رعاية دقيقة لابتسامة مريحة</p>
-                        <p className="mt-1 text-[0.72rem] uppercase tracking-[0.24em] text-[#f2d38d]/85">Comfort-led Dental Care</p>
+                        <p className="mt-1 text-[0.72rem] uppercase tracking-[0.24em] text-[#f2d38d]/85">{brandFull}</p>
                         <p className="mt-3 max-w-[15rem] text-[0.8rem] leading-5 text-white/70">
                           تشخيص واضح وخيارات علاج مدروسة في أجواء هادئة
                         </p>
@@ -175,9 +184,9 @@ export default function HomePage() {
               </div>
             </div>
             <div className="hidden sm:block">
-              <p className="eyebrow">{t('home.eyebrow')}</p>
-              <h1 className="mt-3 font-display text-[2rem] leading-[1.02] sm:mt-5 sm:text-5xl lg:text-7xl">{t('home.title')}</h1>
-              <p className="mt-3 max-w-2xl text-[0.92rem] leading-6 text-white/70 sm:mt-6 sm:text-lg sm:leading-8">{t('home.description')}</p>
+              <p className="eyebrow">{homeEyebrow}</p>
+              <h1 className="mt-3 font-display text-[2rem] leading-[1.02] sm:mt-5 sm:text-5xl lg:text-7xl">{homeTitle}</h1>
+              <p className="mt-3 max-w-2xl text-[0.92rem] leading-6 text-white/70 sm:mt-6 sm:text-lg sm:leading-8">{homeDescription}</p>
             </div>
             <div className="mt-5 grid gap-3 sm:mt-8 sm:flex sm:flex-wrap">
               <Link to="/booking" className="btn-gold inline-flex items-center justify-center gap-2 !px-4 !py-3 text-sm sm:!px-6 sm:!py-3 sm:text-base"><Calendar size={16} />{t('home.primaryCta')}</Link>
@@ -215,13 +224,13 @@ export default function HomePage() {
       </section>
 
       <section className="px-4 py-20">
-        <SectionHeading eyebrow="ELORA" title={t('home.featuresTitle')} text={t('home.showcaseText')} />
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3">
+        <SectionHeading eyebrow={brandName} title={homeFeaturesTitle} text={homeShowcaseText} />
+        <div className="scrollbar-hide mx-auto flex max-w-7xl snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
           {showcaseImages.map((image, index) => (
-            <article key={image} className="premium-card overflow-hidden">
+            <article key={image} className="premium-card min-w-[78vw] snap-start overflow-hidden sm:min-w-[24rem] lg:min-w-[28rem]">
               <img src={image} alt={`Showcase ${index + 1}`} className="h-32 w-full object-cover sm:h-64" />
               <div className="p-3 sm:p-6">
-                <div className="inline-flex items-center gap-2 text-[0.72rem] text-[#f2d38d] sm:text-sm"><CheckCircle2 size={14} /> ELORA</div>
+                <div className="inline-flex items-center gap-2 text-[0.72rem] text-[#f2d38d] sm:text-sm"><CheckCircle2 size={14} /> {brandName}</div>
                 <h3 className="mt-3 text-lg font-semibold sm:mt-4 sm:text-2xl">{t('home.features')[index]}</h3>
               </div>
             </article>
@@ -231,21 +240,23 @@ export default function HomePage() {
 
       <section className="bg-white/[0.02] px-4 py-20">
         <SectionHeading eyebrow={t('nav.services')} title={t('services.sectionTitle')} text={t('services.sectionText')} />
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {services.map((service) => <ServiceCard key={service._id} service={service} />)}
-        </div>
-        <div className="mt-10 text-center">
-          <Link to="/services" className="btn-dark">{t('common.viewAll')}</Link>
+        <div className="scrollbar-hide mx-auto flex max-w-7xl snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
+          {services.map((service) => (
+            <div key={service._id} className="min-w-[78vw] snap-start sm:min-w-[21rem] lg:min-w-[24rem]">
+              <ServiceCard service={service} compact />
+            </div>
+          ))}
         </div>
       </section>
 
       <section className="px-4 py-20">
         <SectionHeading eyebrow={t('nav.doctors')} title={t('doctors.sectionTitle')} text={t('doctors.sectionText')} />
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {doctors.map((doctor) => <DoctorCard key={doctor._id} doctor={doctor} />)}
-        </div>
-        <div className="mt-10 text-center">
-          <Link to="/doctors" className="btn-dark inline-flex items-center gap-2">{t('common.viewAll')} <ArrowRight size={16} /></Link>
+        <div className="scrollbar-hide mx-auto flex max-w-7xl snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
+          {doctors.map((doctor) => (
+            <div key={doctor._id} className="min-w-[78vw] snap-start sm:min-w-[22rem] lg:min-w-[25rem]">
+              <DoctorCard doctor={doctor} compact />
+            </div>
+          ))}
         </div>
       </section>
     </main>

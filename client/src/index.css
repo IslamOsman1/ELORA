@@ -229,6 +229,13 @@ select.input:required:invalid {
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
 }
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
 @keyframes floatTooth {
   0% {
     transform: translate3d(0, 0, 0) rotate(0deg);

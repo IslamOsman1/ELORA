@@ -4,6 +4,7 @@ import Service from '../models/Service.js';
 import Doctor from '../models/Doctor.js';
 import Appointment from '../models/Appointment.js';
 import Message from '../models/Message.js';
+import { getOrCreateSiteSettings } from '../utils/getSiteSettings.js';
 
 const router = express.Router();
 const appointmentSchema = z.object({
@@ -13,7 +14,18 @@ const appointmentSchema = z.object({
 const messageSchema = z.object({ name: z.string().min(2), email: z.string().email(), phone: z.string().optional(), subject: z.string().optional(), message: z.string().min(5) });
 
 router.get('/services', async (req, res) => res.json(await Service.find().sort({ featured: -1, createdAt: -1 })));
+router.get('/services/:id', async (req, res) => {
+  const service = await Service.findById(req.params.id);
+  if (!service) return res.status(404).json({ message: 'Service not found' });
+  return res.json(service);
+});
 router.get('/doctors', async (req, res) => res.json(await Doctor.find().sort({ createdAt: -1 })));
+router.get('/doctors/:id', async (req, res) => {
+  const doctor = await Doctor.findById(req.params.id);
+  if (!doctor) return res.status(404).json({ message: 'Doctor not found' });
+  return res.json(doctor);
+});
+router.get('/site-settings', async (req, res) => res.json(await getOrCreateSiteSettings()));
 router.get('/slots', async (req, res) => {
   const { date, doctor } = req.query;
   const slots = ['10:00','10:30','11:00','11:30','12:00','12:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00'];

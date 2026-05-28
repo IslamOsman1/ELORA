@@ -12,7 +12,8 @@ export async function ensureAdmin() {
     name: 'ELORA Admin',
     email: adminEmail,
     password: await bcrypt.hash(adminPassword, 10),
-    role: 'admin'
+    role: 'admin',
+    authProviders: ['manual']
   });
 
   console.log(`Default admin created: ${adminEmail}`);

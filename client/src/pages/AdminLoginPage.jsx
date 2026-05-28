@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
+import { setAdminToken } from '../utils/auth';
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function AdminLoginPage() {
     setLoading(true);
     try {
       const response = await api.post('/auth/login', { email: email.trim(), password });
-      localStorage.setItem('elora_token', response.data.token);
+      setAdminToken(response.data.token);
       toast.success('Welcome back');
       navigate('/admin');
     } catch (error) {
