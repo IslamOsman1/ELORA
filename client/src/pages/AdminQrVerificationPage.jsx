@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { ArrowLeft, Camera, CameraOff, CheckCircle2, QrCode, RefreshCcw, ShieldCheck, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { BrowserCodeReader, BrowserQRCodeReader } from '@zxing/browser';
+import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -12,6 +13,9 @@ export default function AdminQrVerificationPage() {
   const videoRef = useRef(null);
   const readerRef = useRef(null);
   const controlsRef = useRef(null);
+  const streamRef = useRef(null);
+  const scanTimerRef = useRef(null);
+  const barcodeDetectorRef = useRef(null);
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [cameraLoading, setCameraLoading] = useState(false);
   const [availableCameras, setAvailableCameras] = useState([]);
@@ -41,7 +45,8 @@ export default function AdminQrVerificationPage() {
     attendanceDone: isArabic ? 'تم تأكيد حضور الجلسة' : 'Attendance confirmed',
     resultTitle: isArabic ? 'نتيجة التحقق' : 'Verification result',
     cameraTitle: isArabic ? 'مسح الكاميرا' : 'Camera scan',
-    scanPlaceholder: isArabic ? 'ابدأ المسح بالكاميرا أو ألصق الرمز لعرض بيانات الموعد.' : 'Start a camera scan or paste the code to display appointment details.'
+    scanPlaceholder: isArabic ? 'ابدأ المسح بالكاميرا أو ألصق الرمز لعرض بيانات الموعد.' : 'Start a camera scan or paste the code to display appointment details.',
+    scanningNow: isArabic ? 'جارٍ البحث عن كود QR...' : 'Scanning for a QR code...'
   };
 
   useEffect(() => {
@@ -70,8 +75,12 @@ export default function AdminQrVerificationPage() {
     controlsRef.current?.stop?.();
     controlsRef.current = null;
     readerRef.current?.reset?.();
+    if (scanTimerRef.current) {
+      clearInterval(scanTimerRef.current);
+      scanTimerRef.current = null;
+    }
 
-    const stream = videoRef.current?.srcObject;
+    const stream = streamRef.current || videoRef.current?.srcObject;
     if (stream && typeof stream.getTracks === 'function') {
       stream.getTracks().forEach((track) => track.stop());
     }
@@ -80,6 +89,7 @@ export default function AdminQrVerificationPage() {
       videoRef.current.srcObject = null;
     }
 
+    streamRef.current = null;
     setCameraEnabled(false);
   }
 
@@ -112,7 +122,10 @@ export default function AdminQrVerificationPage() {
       stopScanner();
 
       if (!readerRef.current) {
-        readerRef.current = new BrowserQRCodeReader();
+        const hints = new Map();
+        hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.QR_CODE]);
+        hints.set(DecodeHintType.TRY_HARDER, true);
+        readerRef.current = new BrowserQRCodeReader(hints);
       }
 
       const devices = await loadVideoDevices().catch(() => availableCameras);
@@ -147,7 +160,35 @@ export default function AdminQrVerificationPage() {
             }
           };
 
-      controlsRef.current = await readerRef.current.decodeFromConstraints(constraints, videoRef.current, callback);
+      const NativeBarcodeDetector = globalThis.BarcodeDetector;
+
+      if (NativeBarcodeDetector) {
+        if (!barcodeDetectorRef.current) {
+          barcodeDetectorRef.current = new NativeBarcodeDetector({ formats: ['qr_code'] });
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        streamRef.current = stream;
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+
+        scanTimerRef.current = setInterval(async () => {
+          if (!videoRef.current || videoRef.current.readyState < 2 || lookupLoading) return;
+
+          try {
+            const barcodes = await barcodeDetectorRef.current.detect(videoRef.current);
+            const qrCode = barcodes.find((item) => item.rawValue);
+            if (!qrCode?.rawValue) return;
+            stopScanner();
+            await verifyCode(qrCode.rawValue);
+          } catch (_) {
+            // Ignore transient frame read failures while the camera warms up.
+          }
+        }, 250);
+      } else {
+        controlsRef.current = await readerRef.current.decodeFromConstraints(constraints, videoRef.current, callback);
+      }
+
       setCameraEnabled(true);
       toast.success(text.cameraReady);
     } catch (error) {
@@ -193,7 +234,21 @@ export default function AdminQrVerificationPage() {
             <p className="mt-3 text-sm leading-7 text-white/62">{text.cameraHint}</p>
 
             <div className="mt-5 overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#090708]">
-              <video ref={videoRef} className="aspect-[4/5] w-full object-cover" muted playsInline />
+              <div className="relative">
+                <video ref={videoRef} className="aspect-[4/5] w-full object-cover" muted playsInline />
+                {cameraEnabled ? (
+                  <>
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_24%,rgba(5,4,5,0.28)_64%,rgba(5,4,5,0.72)_100%)]" />
+                    <div className="pointer-events-none absolute left-1/2 top-1/2 h-52 w-52 -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border-2 border-[#f2d38d] shadow-[0_0_0_9999px_rgba(0,0,0,0.18)]">
+                      <div className="absolute inset-x-6 top-0 h-[2px] bg-[#f2d38d]" />
+                      <div className="absolute bottom-0 left-6 right-6 h-[2px] bg-[#f2d38d]" />
+                    </div>
+                    <div className="absolute bottom-4 left-4 right-4 rounded-full border border-white/10 bg-black/35 px-4 py-2 text-center text-xs text-white/80 backdrop-blur">
+                      {text.scanningNow}
+                    </div>
+                  </>
+                ) : null}
+              </div>
             </div>
 
             {availableCameras.length > 1 ? (
