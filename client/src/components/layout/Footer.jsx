@@ -59,6 +59,12 @@ function resolveSocialLink(value, baseUrl) {
   return `${baseUrl.replace(/\/$/, '')}/${value.replace(/^@/, '').replace(/^\//, '')}`;
 }
 
+function resolveLocationLink(value) {
+  if (!value) return '';
+  if (/^https?:\/\//i.test(value)) return value;
+  return `https://${value.replace(/^\/+/, '')}`;
+}
+
 function ContactButton({ as: Component = 'a', href, icon: Icon, children, external = false }) {
   const className = 'inline-flex min-h-12 items-center gap-3 rounded-full border border-white/12 bg-white/[0.04] px-4 py-3 text-sm text-white/78 transition hover:border-[#f4d59a]/40 hover:bg-white/[0.08] hover:text-white';
 
@@ -94,6 +100,7 @@ export default function Footer() {
   const WhatsappIcon = resolveIcon(contact.whatsappIcon, MessageCircle);
   const InstagramIcon = resolveIcon(contact.instagramIcon, Instagram);
   const FacebookIcon = resolveIcon(contact.facebookIcon, Facebook);
+  const locationHref = resolveLocationLink(contact.locationUrl);
 
   const links = [
     ['/', t('nav.home')],
@@ -148,7 +155,7 @@ export default function Footer() {
         <div>
           <h3 className="text-sm uppercase tracking-[0.32em] text-[#f4d59a]">{t('footer.contact')}</h3>
           <div className="mt-4 grid gap-3">
-            <ContactButton as="span" icon={LocationIcon}>
+            <ContactButton as={locationHref ? 'a' : 'span'} href={locationHref || undefined} icon={LocationIcon} external={Boolean(locationHref)}>
               {contact.location || 'Istanbul / Cairo'}
             </ContactButton>
             <ContactButton href={`tel:${normalizePhone(contact.phone) || '+201000000000'}`} icon={PhoneIcon}>

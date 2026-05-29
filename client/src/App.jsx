@@ -23,6 +23,8 @@ import ProfilePage from './pages/ProfilePage';
 import PatientBookingsPage from './pages/PatientBookingsPage';
 import CaseFollowUpPage from './pages/CaseFollowUpPage';
 import NotificationsPage from './pages/NotificationsPage';
+import CaseDetailsPage from './pages/CaseDetailsPage';
+import TreatmentCasesPage from './pages/TreatmentCasesPage';
 import { getAdminToken } from './utils/auth';
 
 class AppErrorBoundary extends Component {
@@ -71,6 +73,8 @@ export default function App() {
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/services" element={<ServicesPage />} />
                     <Route path="/services/:serviceId" element={<ServiceDetailsPage />} />
+                    <Route path="/cases" element={<TreatmentCasesPage />} />
+                    <Route path="/cases/:caseId" element={<CaseDetailsPage />} />
                     <Route path="/doctors" element={<DoctorsPage />} />
                     <Route path="/doctors/:doctorId" element={<DoctorDetailsPage />} />
                     <Route path="/booking" element={<BookingPage />} />

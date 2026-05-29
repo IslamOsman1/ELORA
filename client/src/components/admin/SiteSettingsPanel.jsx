@@ -206,7 +206,6 @@ export default function SiteSettingsPanel() {
       >
         <div className="grid gap-6">
           <FieldGrid fields={groups.branding} form={form} setForm={setForm} />
-          <FieldGrid fields={groups.contact} form={form} setForm={setForm} />
           <div className="grid gap-4 md:grid-cols-2">
             <SettingsCard
               title={isArabic ? 'نص الفوتر بالعربية' : 'Arabic footer tagline'}

@@ -8,6 +8,7 @@ export const defaultSiteSettings = {
   },
   contact: {
     location: 'Istanbul / Cairo',
+    locationUrl: '',
     phone: '+20 100 000 0000',
     email: 'contact@elora-dental.com',
     locationIcon: 'MapPin',
@@ -20,6 +21,15 @@ export const defaultSiteSettings = {
     instagramIcon: 'Instagram',
     facebookIcon: 'Facebook'
   },
+  workingHours: [
+    { dayKey: 'sunday', labelAr: 'الأحد', labelEn: 'Sunday', enabled: true, from: '10:00', to: '17:00' },
+    { dayKey: 'monday', labelAr: 'الاثنين', labelEn: 'Monday', enabled: true, from: '10:00', to: '17:00' },
+    { dayKey: 'tuesday', labelAr: 'الثلاثاء', labelEn: 'Tuesday', enabled: true, from: '10:00', to: '17:00' },
+    { dayKey: 'wednesday', labelAr: 'الأربعاء', labelEn: 'Wednesday', enabled: true, from: '10:00', to: '17:00' },
+    { dayKey: 'thursday', labelAr: 'الخميس', labelEn: 'Thursday', enabled: true, from: '10:00', to: '17:00' },
+    { dayKey: 'friday', labelAr: 'الجمعة', labelEn: 'Friday', enabled: false, from: '10:00', to: '17:00' },
+    { dayKey: 'saturday', labelAr: 'السبت', labelEn: 'Saturday', enabled: true, from: '10:00', to: '17:00' }
+  ],
   images: {
     homeShowcaseImages: [
       'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=1200&q=80',

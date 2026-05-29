@@ -33,7 +33,8 @@ export function SiteSettingsProvider({ children }) {
       return getValue(settings?.images, path) ?? fallback;
     },
     branding: settings?.branding || {},
-    contact: settings?.contact || {}
+    contact: settings?.contact || {},
+    workingHours: settings?.workingHours || []
   }), [loading, settings]);
 
   return <SiteSettingsContext.Provider value={value}>{children}</SiteSettingsContext.Provider>;

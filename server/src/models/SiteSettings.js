@@ -10,6 +10,7 @@ const siteSettingsSchema = new mongoose.Schema({
   },
   contact: {
     location: { type: String, default: '' },
+    locationUrl: { type: String, default: '' },
     phone: { type: String, default: '' },
     email: { type: String, default: '' },
     locationIcon: { type: String, default: 'MapPin' },
@@ -21,6 +22,17 @@ const siteSettingsSchema = new mongoose.Schema({
     whatsappIcon: { type: String, default: 'MessageCircle' },
     instagramIcon: { type: String, default: 'Instagram' },
     facebookIcon: { type: String, default: 'Facebook' }
+  },
+  workingHours: {
+    type: [{
+      dayKey: { type: String, required: true },
+      labelAr: { type: String, default: '' },
+      labelEn: { type: String, default: '' },
+      enabled: { type: Boolean, default: true },
+      from: { type: String, default: '10:00' },
+      to: { type: String, default: '17:00' }
+    }],
+    default: []
   },
   images: {
     homeShowcaseImages: { type: [String], default: [] },

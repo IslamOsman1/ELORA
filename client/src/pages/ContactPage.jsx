@@ -36,6 +36,9 @@ export default function ContactPage() {
   const LocationIcon = resolveIcon(contact.locationIcon, MapPin);
   const PhoneIcon = resolveIcon(contact.phoneIcon, Phone);
   const EmailIcon = resolveIcon(contact.emailIcon, Mail);
+  const locationHref = contact.locationUrl
+    ? (/^https?:\/\//i.test(contact.locationUrl) ? contact.locationUrl : `https://${contact.locationUrl.replace(/^\/+/, '')}`)
+    : '';
 
   async function submit(event) {
     event.preventDefault();
@@ -65,6 +68,11 @@ export default function ContactPage() {
                 <LocationIcon className="mb-3 text-[#f2d38d]" />
                 <p className="font-semibold text-white">{t('contact.info.location')}</p>
                 <p className="mt-1">{contact.location || t('contact.info.locationValue')}</p>
+                {locationHref ? (
+                  <a href={locationHref} target="_blank" rel="noreferrer" className="btn-dark mt-4 inline-flex !px-4 !py-2 text-xs sm:text-sm">
+                    {language === 'ar' ? 'افتح الموقع' : 'Open location'}
+                  </a>
+                ) : null}
               </div>
               <div className="premium-card p-5 text-sm text-white/70">
                 <PhoneIcon className="mb-3 text-[#f2d38d]" />

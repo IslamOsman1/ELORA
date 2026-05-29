@@ -25,6 +25,8 @@ import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 import { clearAdminToken } from '../utils/auth';
 import SiteSettingsPanel from '../components/admin/SiteSettingsPanel';
+import WorkingHoursPanel from '../components/admin/WorkingHoursPanel';
+import ContactSettingsPanel from '../components/admin/ContactSettingsPanel';
 import { appointmentStatusMeta, formatDisplayDate, formatDisplayDateTime, getStatusMeta, medicalSessionStatusMeta } from '../utils/patient';
 
 const serviceInitial = {
@@ -36,6 +38,12 @@ const serviceInitial = {
   priceFrom: 0,
   icon: 'Sparkles',
   image: '',
+  bannerImage: '',
+  featuresText: '',
+  featuresArText: '',
+  treatmentStepsText: '',
+  treatmentStepsArText: '',
+  faqText: '',
   featured: false
 };
 
@@ -64,6 +72,32 @@ const sessionInitial = {
   prescriptionItems: [
     { medicineName: '', dosage: '', frequencyPerDay: '', duration: '', instructions: '', notes: '' }
   ]
+};
+
+const caseInitial = {
+  service: '',
+  doctor: '',
+  title: '',
+  titleAr: '',
+  shortDescription: '',
+  shortDescriptionAr: '',
+  fullDescription: '',
+  fullDescriptionAr: '',
+  patientProblem: '',
+  patientProblemAr: '',
+  treatmentStepsText: '',
+  treatmentStepsArText: '',
+  durationText: '',
+  durationTextAr: '',
+  resultSummary: '',
+  resultSummaryAr: '',
+  mainImage: '',
+  beforeImagesText: '',
+  afterImagesText: '',
+  galleryImagesText: '',
+  caseDate: '',
+  published: true,
+  displayOrder: 0
 };
 
 function StatCard({ icon: Icon, label, value }) {
@@ -106,10 +140,13 @@ export default function AdminDashboardPage() {
   const [users, setUsers] = useState([]);
   const [patients, setPatients] = useState([]);
   const [activityLogs, setActivityLogs] = useState([]);
+  const [treatmentCases, setTreatmentCases] = useState([]);
   const [serviceForm, setServiceForm] = useState(serviceInitial);
   const [doctorForm, setDoctorForm] = useState(doctorInitial);
+  const [caseForm, setCaseForm] = useState(caseInitial);
   const [editingServiceId, setEditingServiceId] = useState('');
   const [editingDoctorId, setEditingDoctorId] = useState('');
+  const [editingCaseId, setEditingCaseId] = useState('');
   const [appointmentFilters, setAppointmentFilters] = useState({ search: '', patientPhone: '', status: 'all', dateFrom: '', dateTo: '', doctor: 'all' });
   const [selectedPatientId, setSelectedPatientId] = useState('');
   const [selectedPatientFile, setSelectedPatientFile] = useState(null);
@@ -119,6 +156,8 @@ export default function AdminDashboardPage() {
   const [medicalFileForm, setMedicalFileForm] = useState({ title: '', type: 'medical_image', note: '', file: null, session: '' });
   const [savingSession, setSavingSession] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [caseSearch, setCaseSearch] = useState('');
+  const [caseServiceFilter, setCaseServiceFilter] = useState('all');
 
   const locale = isArabic ? 'ar-EG' : 'en-US';
   const labels = useMemo(() => ({
@@ -148,8 +187,11 @@ export default function AdminDashboardPage() {
     ['follow_up', labels.followUp],
     ['users', labels.users],
     ['services', labels.services],
+    ['cases', isArabic ? 'الحالات المعالجة' : 'Treatment cases'],
     ['doctors', labels.doctors],
     ['messages', labels.messages],
+    ['contact_settings', isArabic ? 'التواصل' : 'Contact'],
+    ['working_hours', isArabic ? 'مواعيد العمل' : 'Working hours'],
     ['activity', labels.activity],
     ['settings', labels.settings]
   ];
@@ -168,14 +210,15 @@ export default function AdminDashboardPage() {
   const activeTabLabel = tabEntries.find(([key]) => key === tab)?.[1] || tab;
 
   async function loadCore() {
-    const [statsRes, messagesRes, servicesRes, doctorsRes, usersRes, patientsRes, logsRes] = await Promise.all([
+    const [statsRes, messagesRes, servicesRes, doctorsRes, usersRes, patientsRes, logsRes, casesRes] = await Promise.all([
       api.get('/admin/stats'),
       api.get('/admin/messages'),
       api.get('/services'),
       api.get('/doctors'),
       api.get('/admin/users'),
       api.get('/admin/patients', { params: { search: patientSearch, patientPhone } }),
-      api.get('/admin/activity-logs')
+      api.get('/admin/activity-logs'),
+      api.get('/admin/cases', { params: { search: caseSearch, service: caseServiceFilter } })
     ]);
 
     setStats(statsRes.data);
@@ -185,6 +228,7 @@ export default function AdminDashboardPage() {
     setUsers(usersRes.data);
     setPatients(patientsRes.data);
     setActivityLogs(logsRes.data);
+    setTreatmentCases(casesRes.data);
   }
 
   async function loadAppointments() {
@@ -234,6 +278,27 @@ export default function AdminDashboardPage() {
     navigate('/');
   }
 
+  function linesToArray(value) {
+    return String(value || '').split('\n').map((item) => item.trim()).filter(Boolean);
+  }
+
+  function arrayToLines(value) {
+    return Array.isArray(value) ? value.join('\n') : '';
+  }
+
+  function faqItemsToLines(items) {
+    return (items || [])
+      .map((item) => [item.question || '', item.answer || '', item.questionAr || '', item.answerAr || ''].join(' | '))
+      .join('\n');
+  }
+
+  function linesToFaqItems(value) {
+    return linesToArray(value).map((line) => {
+      const [question = '', answer = '', questionAr = '', answerAr = ''] = line.split('|').map((item) => item.trim());
+      return { question, answer, questionAr, answerAr };
+    });
+  }
+
   function editService(service) {
     setEditingServiceId(service._id);
     setServiceForm({
@@ -245,6 +310,12 @@ export default function AdminDashboardPage() {
       priceFrom: service.priceFrom || 0,
       icon: service.icon || 'Sparkles',
       image: service.image || '',
+      bannerImage: service.bannerImage || '',
+      featuresText: arrayToLines(service.features),
+      featuresArText: arrayToLines(service.featuresAr),
+      treatmentStepsText: arrayToLines(service.treatmentSteps),
+      treatmentStepsArText: arrayToLines(service.treatmentStepsAr),
+      faqText: faqItemsToLines(service.faqItems),
       featured: Boolean(service.featured)
     });
   }
@@ -261,6 +332,36 @@ export default function AdminDashboardPage() {
       experienceYears: doctor.experienceYears || 5,
       availableDays: (doctor.availableDays || []).join(', ')
     });
+  }
+
+  function editTreatmentCase(item) {
+    setEditingCaseId(item._id);
+    setCaseForm({
+      service: item.service?._id || item.service || '',
+      doctor: item.doctor?._id || item.doctor || '',
+      title: item.title || '',
+      titleAr: item.titleAr || '',
+      shortDescription: item.shortDescription || '',
+      shortDescriptionAr: item.shortDescriptionAr || '',
+      fullDescription: item.fullDescription || '',
+      fullDescriptionAr: item.fullDescriptionAr || '',
+      patientProblem: item.patientProblem || '',
+      patientProblemAr: item.patientProblemAr || '',
+      treatmentStepsText: arrayToLines(item.treatmentSteps),
+      treatmentStepsArText: arrayToLines(item.treatmentStepsAr),
+      durationText: item.durationText || '',
+      durationTextAr: item.durationTextAr || '',
+      resultSummary: item.resultSummary || '',
+      resultSummaryAr: item.resultSummaryAr || '',
+      mainImage: item.mainImage || '',
+      beforeImagesText: arrayToLines(item.beforeImages),
+      afterImagesText: arrayToLines(item.afterImages),
+      galleryImagesText: arrayToLines(item.galleryImages),
+      caseDate: item.caseDate || '',
+      published: Boolean(item.published),
+      displayOrder: item.displayOrder || 0
+    });
+    setTab('cases');
   }
 
   async function uploadImage(file, type) {
@@ -299,9 +400,45 @@ export default function AdminDashboardPage() {
     }
   }
 
+  async function handleCaseImageUpload(event, field) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const imageUrl = await uploadImage(file, 'cases');
+      setCaseForm((current) => {
+        if (field === 'mainImage') {
+          return { ...current, mainImage: imageUrl };
+        }
+        const currentLines = linesToArray(current[field]);
+        return { ...current, [field]: [...currentLines, imageUrl].join('\n') };
+      });
+      toast.success(isArabic ? 'تم رفع الصورة' : 'Image uploaded');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Image upload failed');
+    } finally {
+      event.target.value = '';
+    }
+  }
+
   async function saveService(event) {
     event.preventDefault();
-    const payload = { ...serviceForm, duration: Number(serviceForm.duration), priceFrom: Number(serviceForm.priceFrom) };
+    const payload = {
+      title: serviceForm.title,
+      titleAr: serviceForm.titleAr,
+      description: serviceForm.description,
+      descriptionAr: serviceForm.descriptionAr,
+      duration: Number(serviceForm.duration),
+      priceFrom: Number(serviceForm.priceFrom),
+      icon: serviceForm.icon,
+      image: serviceForm.image,
+      bannerImage: serviceForm.bannerImage,
+      features: linesToArray(serviceForm.featuresText),
+      featuresAr: linesToArray(serviceForm.featuresArText),
+      treatmentSteps: linesToArray(serviceForm.treatmentStepsText),
+      treatmentStepsAr: linesToArray(serviceForm.treatmentStepsArText),
+      faqItems: linesToFaqItems(serviceForm.faqText),
+      featured: Boolean(serviceForm.featured)
+    };
     if (editingServiceId) await api.patch(`/admin/services/${editingServiceId}`, payload);
     else await api.post('/admin/services', payload);
     toast.success(isArabic ? 'تم الحفظ' : 'Saved');
@@ -322,6 +459,41 @@ export default function AdminDashboardPage() {
     toast.success(isArabic ? 'تم الحفظ' : 'Saved');
     setEditingDoctorId('');
     setDoctorForm(doctorInitial);
+    await loadCore();
+  }
+
+  async function saveTreatmentCase(event) {
+    event.preventDefault();
+    const payload = {
+      service: caseForm.service,
+      doctor: caseForm.doctor || null,
+      title: caseForm.title,
+      titleAr: caseForm.titleAr,
+      shortDescription: caseForm.shortDescription,
+      shortDescriptionAr: caseForm.shortDescriptionAr,
+      fullDescription: caseForm.fullDescription,
+      fullDescriptionAr: caseForm.fullDescriptionAr,
+      patientProblem: caseForm.patientProblem,
+      patientProblemAr: caseForm.patientProblemAr,
+      treatmentSteps: linesToArray(caseForm.treatmentStepsText),
+      treatmentStepsAr: linesToArray(caseForm.treatmentStepsArText),
+      durationText: caseForm.durationText,
+      durationTextAr: caseForm.durationTextAr,
+      resultSummary: caseForm.resultSummary,
+      resultSummaryAr: caseForm.resultSummaryAr,
+      mainImage: caseForm.mainImage,
+      beforeImages: linesToArray(caseForm.beforeImagesText),
+      afterImages: linesToArray(caseForm.afterImagesText),
+      galleryImages: linesToArray(caseForm.galleryImagesText),
+      caseDate: caseForm.caseDate,
+      published: Boolean(caseForm.published),
+      displayOrder: Number(caseForm.displayOrder || 0)
+    };
+    if (editingCaseId) await api.patch(`/admin/cases/${editingCaseId}`, payload);
+    else await api.post('/admin/cases', payload);
+    toast.success(isArabic ? 'تم حفظ الحالة' : 'Case saved');
+    setEditingCaseId('');
+    setCaseForm(caseInitial);
     await loadCore();
   }
 
@@ -766,12 +938,18 @@ export default function AdminDashboardPage() {
                 <textarea className="input" rows="4" placeholder="Description" value={serviceForm.description} onChange={(event) => setServiceForm({ ...serviceForm, description: event.target.value })} required />
                 <textarea className="input" rows="4" placeholder="Arabic description" value={serviceForm.descriptionAr} onChange={(event) => setServiceForm({ ...serviceForm, descriptionAr: event.target.value })} />
                 <input className="input" placeholder="Image URL" value={serviceForm.image} onChange={(event) => setServiceForm({ ...serviceForm, image: event.target.value })} />
+                <input className="input" placeholder="Banner image URL" value={serviceForm.bannerImage} onChange={(event) => setServiceForm({ ...serviceForm, bannerImage: event.target.value })} />
                 <input className="input" type="file" accept="image/*" onChange={handleServiceImageChange} />
                 {serviceForm.image ? <img src={serviceForm.image} alt="Service preview" className="h-36 w-full rounded-[1.4rem] object-cover" /> : null}
                 <div className="grid grid-cols-2 gap-3">
                   <input className="input" type="number" placeholder="Duration" value={serviceForm.duration} onChange={(event) => setServiceForm({ ...serviceForm, duration: event.target.value })} />
                   <input className="input" type="number" placeholder="Price from" value={serviceForm.priceFrom} onChange={(event) => setServiceForm({ ...serviceForm, priceFrom: event.target.value })} />
                 </div>
+                <textarea className="input" rows="4" placeholder="Features (one per line)" value={serviceForm.featuresText} onChange={(event) => setServiceForm({ ...serviceForm, featuresText: event.target.value })} />
+                <textarea className="input" rows="4" placeholder="Arabic features (one per line)" value={serviceForm.featuresArText} onChange={(event) => setServiceForm({ ...serviceForm, featuresArText: event.target.value })} />
+                <textarea className="input" rows="4" placeholder="Treatment steps (one per line)" value={serviceForm.treatmentStepsText} onChange={(event) => setServiceForm({ ...serviceForm, treatmentStepsText: event.target.value })} />
+                <textarea className="input" rows="4" placeholder="Arabic treatment steps (one per line)" value={serviceForm.treatmentStepsArText} onChange={(event) => setServiceForm({ ...serviceForm, treatmentStepsArText: event.target.value })} />
+                <textarea className="input" rows="4" placeholder="FAQs: question | answer | questionAr | answerAr" value={serviceForm.faqText} onChange={(event) => setServiceForm({ ...serviceForm, faqText: event.target.value })} />
                 <button className="btn-gold">{editingServiceId ? (isArabic ? 'تحديث' : 'Update') : (isArabic ? 'إضافة' : 'Create')}</button>
               </form>
             </AdminPanel>
@@ -790,6 +968,119 @@ export default function AdminDashboardPage() {
                     <div className="flex gap-2">
                       <button onClick={() => editService(service)} className="icon-btn"><PencilLine size={16} /></button>
                       <button onClick={() => removeItem('services', service._id)} className="icon-btn"><Trash2 size={16} /></button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </AdminPanel>
+          </div>
+        )}
+
+        {tab === 'cases' && (
+          <div className="grid gap-6 xl:grid-cols-[430px_1fr]">
+            <AdminPanel title={isArabic ? 'إدارة الحالات المعالجة' : 'Manage treatment cases'}>
+              <form onSubmit={saveTreatmentCase} className="grid gap-3">
+                <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4 text-sm text-white/65">
+                  {isArabic
+                    ? 'اختر الخدمة والطبيب المرتبطين بالحالة حتى تظهر في القسم الصحيح داخل الموقع.'
+                    : 'Choose the linked service and doctor so the case appears in the correct section on the site.'}
+                </div>
+                <select className="input" value={caseForm.service} onChange={(event) => setCaseForm({ ...caseForm, service: event.target.value })} required>
+                  <option value="">{isArabic ? 'اختر الخدمة' : 'Select service'}</option>
+                  {services.map((service) => <option key={service._id} value={service._id}>{service.titleAr || service.title}</option>)}
+                </select>
+                <select className="input" value={caseForm.doctor} onChange={(event) => setCaseForm({ ...caseForm, doctor: event.target.value })}>
+                  <option value="">{isArabic ? 'اختر الطبيب' : 'Select doctor'}</option>
+                  {doctors.map((doctor) => <option key={doctor._id} value={doctor._id}>{doctor.name}</option>)}
+                </select>
+                <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4 text-sm text-white/65">
+                  {isArabic
+                    ? 'اكتب عنوان الحالة والوصف المختصر الذي يظهر في الكارت، ثم أضف النص الكامل لصفحة التفاصيل.'
+                    : 'Write the case title and short text for the card, then add the full text for the details page.'}
+                </div>
+                <input className="input" placeholder="Case title" value={caseForm.title} onChange={(event) => setCaseForm({ ...caseForm, title: event.target.value })} required />
+                <input className="input" placeholder="Arabic case title" value={caseForm.titleAr} onChange={(event) => setCaseForm({ ...caseForm, titleAr: event.target.value })} />
+                <textarea className="input" rows="3" placeholder="Short description" value={caseForm.shortDescription} onChange={(event) => setCaseForm({ ...caseForm, shortDescription: event.target.value })} />
+                <textarea className="input" rows="3" placeholder="Arabic short description" value={caseForm.shortDescriptionAr} onChange={(event) => setCaseForm({ ...caseForm, shortDescriptionAr: event.target.value })} />
+                <textarea className="input" rows="5" placeholder="Full description" value={caseForm.fullDescription} onChange={(event) => setCaseForm({ ...caseForm, fullDescription: event.target.value })} />
+                <textarea className="input" rows="5" placeholder="Arabic full description" value={caseForm.fullDescriptionAr} onChange={(event) => setCaseForm({ ...caseForm, fullDescriptionAr: event.target.value })} />
+                <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4 text-sm text-white/65">
+                  {isArabic
+                    ? 'اشرح هنا مشكلة الحالة وخطوات العلاج والمدة والنتيجة النهائية بشكل واضح ومختصر.'
+                    : 'Explain the case problem, treatment steps, duration, and final result here in a clear short way.'}
+                </div>
+                <textarea className="input" rows="4" placeholder="Patient concern" value={caseForm.patientProblem} onChange={(event) => setCaseForm({ ...caseForm, patientProblem: event.target.value })} />
+                <textarea className="input" rows="4" placeholder="Arabic patient concern" value={caseForm.patientProblemAr} onChange={(event) => setCaseForm({ ...caseForm, patientProblemAr: event.target.value })} />
+                <textarea className="input" rows="4" placeholder="Treatment steps (one per line)" value={caseForm.treatmentStepsText} onChange={(event) => setCaseForm({ ...caseForm, treatmentStepsText: event.target.value })} />
+                <textarea className="input" rows="4" placeholder="Arabic treatment steps (one per line)" value={caseForm.treatmentStepsArText} onChange={(event) => setCaseForm({ ...caseForm, treatmentStepsArText: event.target.value })} />
+                <input className="input" placeholder="Duration text" value={caseForm.durationText} onChange={(event) => setCaseForm({ ...caseForm, durationText: event.target.value })} />
+                <input className="input" placeholder="Arabic duration text" value={caseForm.durationTextAr} onChange={(event) => setCaseForm({ ...caseForm, durationTextAr: event.target.value })} />
+                <textarea className="input" rows="3" placeholder="Result summary" value={caseForm.resultSummary} onChange={(event) => setCaseForm({ ...caseForm, resultSummary: event.target.value })} />
+                <textarea className="input" rows="3" placeholder="Arabic result summary" value={caseForm.resultSummaryAr} onChange={(event) => setCaseForm({ ...caseForm, resultSummaryAr: event.target.value })} />
+                <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4 text-sm text-white/65">
+                  {isArabic
+                    ? 'أضف صورة الكارت الرئيسية، ثم صور قبل العلاج وبعده، وبعد ذلك أي صور إضافية للمعرض.'
+                    : 'Add the main card image, then before/after images, then any extra gallery images.'}
+                </div>
+                <input className="input" placeholder="Main image URL" value={caseForm.mainImage} onChange={(event) => setCaseForm({ ...caseForm, mainImage: event.target.value })} />
+                <input className="input" type="file" accept="image/*" onChange={(event) => handleCaseImageUpload(event, 'mainImage')} />
+                <textarea className="input" rows="3" placeholder="Before images URLs (one per line)" value={caseForm.beforeImagesText} onChange={(event) => setCaseForm({ ...caseForm, beforeImagesText: event.target.value })} />
+                <input className="input" type="file" accept="image/*" onChange={(event) => handleCaseImageUpload(event, 'beforeImagesText')} />
+                <textarea className="input" rows="3" placeholder="After images URLs (one per line)" value={caseForm.afterImagesText} onChange={(event) => setCaseForm({ ...caseForm, afterImagesText: event.target.value })} />
+                <input className="input" type="file" accept="image/*" onChange={(event) => handleCaseImageUpload(event, 'afterImagesText')} />
+                <textarea className="input" rows="3" placeholder="Gallery images URLs (one per line)" value={caseForm.galleryImagesText} onChange={(event) => setCaseForm({ ...caseForm, galleryImagesText: event.target.value })} />
+                <input className="input" type="file" accept="image/*" onChange={(event) => handleCaseImageUpload(event, 'galleryImagesText')} />
+                <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4 text-sm text-white/65">
+                  {isArabic
+                    ? 'يمكنك تحديد تاريخ الحالة وترتيب ظهورها، ثم اختيار نشرها بالموقع أو إبقائها مخفية.'
+                    : 'Set the case date and display order, then choose whether to publish it or keep it hidden.'}
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <input className="input" type="date" value={caseForm.caseDate} onChange={(event) => setCaseForm({ ...caseForm, caseDate: event.target.value })} />
+                  <input className="input" type="number" placeholder="Display order" value={caseForm.displayOrder} onChange={(event) => setCaseForm({ ...caseForm, displayOrder: event.target.value })} />
+                </div>
+                <label className="inline-flex items-center gap-3 text-sm text-white/70">
+                  <input type="checkbox" checked={caseForm.published} onChange={(event) => setCaseForm({ ...caseForm, published: event.target.checked })} />
+                  {isArabic ? 'منشورة للعرض' : 'Published'}
+                </label>
+                <div className="flex gap-3">
+                  <button className="btn-gold flex-1">{editingCaseId ? (isArabic ? 'تحديث' : 'Update') : (isArabic ? 'إضافة' : 'Create')}</button>
+                  <button type="button" className="btn-dark flex-1" onClick={() => { setEditingCaseId(''); setCaseForm(caseInitial); }}>{isArabic ? 'إعادة ضبط' : 'Reset'}</button>
+                </div>
+              </form>
+            </AdminPanel>
+
+            <AdminPanel title={isArabic ? 'الحالات المنشورة' : 'Published cases'} actions={
+              <div className="flex flex-wrap gap-2">
+                <input className="input !w-48" placeholder={isArabic ? 'بحث بالحالة' : 'Search case'} value={caseSearch} onChange={(event) => setCaseSearch(event.target.value)} />
+                <select className="input !w-48" value={caseServiceFilter} onChange={(event) => setCaseServiceFilter(event.target.value)}>
+                  <option value="all">{isArabic ? 'كل الخدمات' : 'All services'}</option>
+                  {services.map((service) => <option key={service._id} value={service._id}>{service.titleAr || service.title}</option>)}
+                </select>
+                <button className="btn-dark !px-4 !py-2 text-sm" onClick={loadCore}>{isArabic ? 'تحديث' : 'Refresh'}</button>
+              </div>
+            }>
+              <div className="grid gap-4">
+                {treatmentCases.map((item) => (
+                  <article key={item._id} className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-4">
+                    <div className="grid gap-4 lg:grid-cols-[140px_1fr_auto] lg:items-center">
+                      <div className="overflow-hidden rounded-[1.2rem] border border-white/10 bg-white/[0.03]">
+                        {item.mainImage ? <img src={item.mainImage} alt={item.title} className="h-28 w-full object-cover" /> : <div className="grid h-28 place-items-center text-white/35"><Image size={22} /></div>}
+                      </div>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <h3 className="text-xl font-semibold text-white">{item.title}</h3>
+                          <span className={`rounded-full border px-3 py-1 text-xs ${item.published ? 'border-emerald-400/20 bg-emerald-500/10 text-emerald-200' : 'border-white/10 bg-white/[0.04] text-white/55'}`}>
+                            {item.published ? (isArabic ? 'منشورة' : 'Published') : (isArabic ? 'مخفية' : 'Hidden')}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-sm text-white/45">{item.service?.titleAr || item.service?.title || '-'} · {item.doctor?.name || '-'}</p>
+                        <p className="mt-2 line-clamp-2 text-sm text-white/65">{item.shortDescriptionAr || item.shortDescription || '-'}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => editTreatmentCase(item)} className="icon-btn"><PencilLine size={16} /></button>
+                        <button onClick={() => removeItem('cases', item._id)} className="icon-btn"><Trash2 size={16} /></button>
+                      </div>
                     </div>
                   </article>
                 ))}
@@ -900,6 +1191,18 @@ export default function AdminDashboardPage() {
                 </article>
               ))}
             </div>
+          </AdminPanel>
+        )}
+
+        {tab === 'working_hours' && (
+          <AdminPanel title={isArabic ? 'مواعيد العمل' : 'Working hours'}>
+            <WorkingHoursPanel />
+          </AdminPanel>
+        )}
+
+        {tab === 'contact_settings' && (
+          <AdminPanel title={isArabic ? 'التواصل' : 'Contact'}>
+            <ContactSettingsPanel />
           </AdminPanel>
         )}
 

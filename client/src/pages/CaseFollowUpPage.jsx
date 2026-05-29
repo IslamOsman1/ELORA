@@ -1,11 +1,11 @@
-import React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Download, FileImage, FileText, Pill, Printer, Stethoscope } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Navigate } from 'react-router-dom';
 import { api } from '../utils/api';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { isPdfFile, resolveMedicalFileUrl } from '../utils/medicalFiles';
 import { formatDisplayDate, getStatusMeta, medicalFileTypeMeta, medicalSessionStatusMeta } from '../utils/patient';
 
 function SessionBadge({ status, isArabic }) {
@@ -35,7 +35,9 @@ export default function CaseFollowUpPage() {
     files: isArabic ? 'الملفات الطبية' : 'Medical files',
     prescription: isArabic ? 'الروشتة' : 'Prescription',
     print: isArabic ? 'طباعة الروشتة' : 'Print prescription',
-    download: isArabic ? 'تحميل PDF' : 'Download PDF'
+    download: isArabic ? 'تحميل PDF' : 'Download PDF',
+    open: isArabic ? 'عرض' : 'Open',
+    downloadFile: isArabic ? 'تحميل' : 'Download'
   };
 
   useEffect(() => {
@@ -53,6 +55,7 @@ export default function CaseFollowUpPage() {
       `${text.followUp}: ${session.followUpDate || '-'}`,
       ''
     ];
+
     (session.prescription?.items || []).forEach((item, index) => {
       lines.push(`${index + 1}. ${item.medicineName}`);
       lines.push(`- ${item.dosage || '-'}`);
@@ -75,7 +78,8 @@ export default function CaseFollowUpPage() {
   function printPrescription(session) {
     const popup = window.open('', '_blank', 'width=900,height=700');
     if (!popup) return;
-    popup.document.write(`<html><head><title>Prescription</title></head><body style="font-family: Arial; padding: 24px;">`);
+
+    popup.document.write('<html><head><title>Prescription</title></head><body style="font-family: Arial; padding: 24px;">');
     popup.document.write(`<h1>Prescription - Session #${session.sessionNumber}</h1>`);
     popup.document.write(`<p>${text.followUp}: ${session.followUpDate || '-'}</p>`);
     (session.prescription?.items || []).forEach((item) => {
@@ -190,8 +194,8 @@ export default function CaseFollowUpPage() {
                       <div className="mt-4 grid gap-3 md:grid-cols-2">
                         {session.files.map((file) => (
                           <article key={file._id} className="rounded-[1.2rem] border border-white/10 bg-white/[0.02] p-3">
-                            {String(file.mimeType || '').startsWith('image/') ? (
-                              <img src={file.url} alt={file.title} className="h-40 w-full rounded-[1rem] object-cover" />
+                            {String(file.mimeType || '').startsWith('image/') && !isPdfFile(file) ? (
+                              <img src={resolveMedicalFileUrl(file)} alt={file.title} className="h-40 w-full rounded-[1rem] object-cover" />
                             ) : (
                               <div className="grid h-40 place-items-center rounded-[1rem] border border-white/10 bg-white/[0.02] text-white/45">
                                 <FileImage />
@@ -202,8 +206,8 @@ export default function CaseFollowUpPage() {
                               {(medicalFileTypeMeta[file.type]?.[isArabic ? 'ar' : 'en']) || file.type}
                             </p>
                             <div className="mt-3 flex gap-2">
-                              <a className="btn-dark !px-4 !py-2 text-sm" href={file.url} target="_blank" rel="noreferrer"><FileText size={14} /> {isArabic ? 'عرض' : 'Open'}</a>
-                              <a className="btn-gold !px-4 !py-2 text-sm" href={file.url} download><Download size={14} /> {isArabic ? 'تحميل' : 'Download'}</a>
+                              <a className="btn-dark !px-4 !py-2 text-sm" href={resolveMedicalFileUrl(file)} target="_blank" rel="noreferrer"><FileText size={14} /> {text.open}</a>
+                              <a className="btn-gold !px-4 !py-2 text-sm" href={resolveMedicalFileUrl(file)} download><Download size={14} /> {text.downloadFile}</a>
                             </div>
                           </article>
                         ))}

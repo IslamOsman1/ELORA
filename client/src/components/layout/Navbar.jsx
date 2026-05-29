@@ -23,6 +23,7 @@ export default function Navbar() {
     ['/', t('nav.home')],
     ['/about', t('nav.about')],
     ['/services', t('nav.services')],
+    ['/cases', isArabic ? 'حالات تم علاجها' : 'Treated cases'],
     ['/doctors', t('nav.doctors')],
     ['/booking', t('nav.booking')],
     ['/contact', t('nav.contact')]

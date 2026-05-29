@@ -9,6 +9,7 @@ import Appointment from '../models/Appointment.js';
 import Service from '../models/Service.js';
 import Doctor from '../models/Doctor.js';
 import { protect } from '../middleware/auth.js';
+import { getOrCreateSiteSettings } from '../utils/getSiteSettings.js';
 
 const router = express.Router();
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -23,6 +24,60 @@ const appointmentSchema = z.object({
   time: z.string().min(3),
   notes: z.string().optional()
 });
+const weekdayKeys = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+function getTodayDateString() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function isPastDate(dateString) {
+  return dateString < getTodayDateString();
+}
+
+function isPastSlot(dateString, timeString) {
+  if (dateString !== getTodayDateString()) return false;
+  const now = new Date();
+  const [hours, minutes] = String(timeString || '').split(':').map(Number);
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) return false;
+  return (hours * 60 + minutes) <= (now.getHours() * 60 + now.getMinutes());
+}
+
+function getDayKey(dateString) {
+  const date = new Date(`${dateString}T00:00:00`);
+  return weekdayKeys[date.getDay()];
+}
+
+function toMinutes(value) {
+  const [hours, minutes] = String(value || '').split(':').map(Number);
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) return null;
+  return hours * 60 + minutes;
+}
+
+function formatMinutes(totalMinutes) {
+  const hours = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
+  const minutes = String(totalMinutes % 60).padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
+function buildSlotsForWorkingDay(dayConfig) {
+  if (!dayConfig?.enabled) return [];
+
+  const start = toMinutes(dayConfig.from);
+  const end = toMinutes(dayConfig.to);
+  if (start === null || end === null || end < start) return [];
+
+  const result = [];
+  for (let minutes = start; minutes <= end; minutes += 30) {
+    result.push(formatMinutes(minutes));
+  }
+  return result;
+}
+
+function getSlotsForDate(settings, dateString) {
+  const dayKey = getDayKey(dateString);
+  const dayConfig = (settings?.workingHours || []).find((item) => item.dayKey === dayKey);
+  return buildSlotsForWorkingDay(dayConfig);
+}
 
 function createAuthToken(user) {
   return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -264,6 +319,15 @@ router.post('/customer/appointments', protect('customer'), async (req, res) => {
   try {
     const data = appointmentSchema.parse(req.body);
     await ensureUserQrToken(req.user);
+    const settings = await getOrCreateSiteSettings();
+    const availableSlots = getSlotsForDate(settings, data.date);
+
+    if (isPastDate(data.date) || isPastSlot(data.date, data.time)) {
+      return res.status(400).json({ message: 'You cannot book a past appointment date or time' });
+    }
+    if (!availableSlots.includes(data.time)) {
+      return res.status(400).json({ message: 'This time is outside working hours or unavailable for this day' });
+    }
 
     const serviceExists = await Service.exists({ _id: data.service });
     if (!serviceExists) {
@@ -275,6 +339,17 @@ router.post('/customer/appointments', protect('customer'), async (req, res) => {
       if (!doctorExists) {
         return res.status(400).json({ message: 'Selected doctor is not available' });
       }
+    }
+
+    const conflictingAppointment = await Appointment.exists({
+      date: data.date,
+      time: data.time,
+      doctor: data.doctor || null,
+      status: { $ne: 'cancelled' }
+    });
+
+    if (conflictingAppointment) {
+      return res.status(409).json({ message: 'This slot is already booked' });
     }
 
     const appointment = await Appointment.create({

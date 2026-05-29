@@ -21,11 +21,16 @@ const initialForm = {
   notes: ''
 };
 
+function getTodayDateString() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 export default function BookingPage() {
   const { t, language } = useLanguage();
   const location = useLocation();
   const { user, isAuthenticated, loading } = useCustomerAuth();
   const { branding, contact, getImage, getText } = useSiteSettings();
+  const today = getTodayDateString();
   const [services, setServices] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [slots, setSlots] = useState(['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '14:00', '14:30', '15:00', '15:30', '16:00']);
@@ -63,8 +68,19 @@ export default function BookingPage() {
     api.get('/slots', { params: { date: form.date, doctor: form.doctor } }).then((response) => setSlots(response.data)).catch(() => {});
   }, [form.date, form.doctor, isAuthenticated]);
 
+  useEffect(() => {
+    if (form.time && !slots.includes(form.time)) {
+      setForm((current) => ({ ...current, time: '' }));
+    }
+  }, [slots, form.time]);
+
   async function submit(event) {
     event.preventDefault();
+    if (form.date < today) {
+      toast.error(language === 'ar' ? 'لا يمكن حجز موعد بتاريخ قديم.' : 'You cannot book an appointment on a past date.');
+      return;
+    }
+
     try {
       await api.post('/auth/customer/appointments', form);
       toast.success(t('booking.success'));
@@ -112,7 +128,7 @@ export default function BookingPage() {
               <option value="">{t('booking.anyDoctor')}</option>
               {doctors.map((doctor) => <option key={doctor._id} value={doctor._id}>{doctor.name}</option>)}
             </select>
-            <input className="input" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required />
+            <input className="input" type="date" min={today} value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value, time: '' })} required />
             <select className="input" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} required>
               <option value="">{t('booking.selectTime')}</option>
               {slots.map((slot) => <option key={slot} value={slot}>{slot}</option>)}

@@ -13,6 +13,7 @@ import MedicalSession from '../models/MedicalSession.js';
 import Prescription from '../models/Prescription.js';
 import MedicalFile from '../models/MedicalFile.js';
 import ActivityLog from '../models/ActivityLog.js';
+import TreatmentCase from '../models/TreatmentCase.js';
 import { isCloudinaryConfigured } from '../config/cloudinary.js';
 import { uploadBufferToCloudinary } from '../utils/uploadToCloudinary.js';
 import { getOrCreateSiteSettings } from '../utils/getSiteSettings.js';
@@ -44,6 +45,32 @@ const medicalSessionSchema = z.object({
     instructions: z.string().optional(),
     notes: z.string().optional()
   })).optional()
+});
+
+const treatmentCaseSchema = z.object({
+  service: z.string().min(8),
+  doctor: z.string().optional().nullable(),
+  title: z.string().min(2),
+  titleAr: z.string().optional(),
+  shortDescription: z.string().optional(),
+  shortDescriptionAr: z.string().optional(),
+  fullDescription: z.string().optional(),
+  fullDescriptionAr: z.string().optional(),
+  patientProblem: z.string().optional(),
+  patientProblemAr: z.string().optional(),
+  treatmentSteps: z.array(z.string()).optional(),
+  treatmentStepsAr: z.array(z.string()).optional(),
+  durationText: z.string().optional(),
+  durationTextAr: z.string().optional(),
+  resultSummary: z.string().optional(),
+  resultSummaryAr: z.string().optional(),
+  mainImage: z.string().optional(),
+  beforeImages: z.array(z.string()).optional(),
+  afterImages: z.array(z.string()).optional(),
+  galleryImages: z.array(z.string()).optional(),
+  caseDate: z.string().optional(),
+  published: z.boolean().optional(),
+  displayOrder: z.coerce.number().optional()
 });
 
 function isDoctorUser(user) {
@@ -759,10 +786,15 @@ router.post('/patients/:id/medical-files', upload.single('file'), async (req, re
     return res.status(500).json({ message: 'Cloudinary is not configured on the server.' });
   }
 
+  const isPdfFile = req.file.mimetype === 'application/pdf' || /\.pdf$/i.test(req.file.originalname || '');
   const uploaded = await uploadBufferToCloudinary(req.file.buffer, {
     folder: 'elora/medical-files',
-    resource_type: 'auto'
+    resource_type: isPdfFile ? 'raw' : 'auto'
   });
+
+  const resolvedUrl = isPdfFile
+    ? String(uploaded.secure_url || '').replace('/image/upload/', '/raw/upload/')
+    : uploaded.secure_url;
 
   const file = await MedicalFile.create({
     patient: patient._id,
@@ -772,7 +804,7 @@ router.post('/patients/:id/medical-files', upload.single('file'), async (req, re
     type: req.body?.type || 'medical_image',
     title: req.body?.title || req.file.originalname,
     note: req.body?.note || '',
-    url: uploaded.secure_url,
+    url: resolvedUrl,
     publicId: uploaded.public_id,
     mimeType: req.file.mimetype,
     originalName: req.file.originalname
@@ -816,6 +848,16 @@ router.put('/site-settings', async (req, res) => {
 
   current.branding = { ...current.branding.toObject?.(), ...(payload.branding || {}) };
   current.contact = { ...current.contact.toObject?.(), ...(payload.contact || {}) };
+  current.workingHours = Array.isArray(payload.workingHours)
+    ? payload.workingHours.map((item) => ({
+        dayKey: item.dayKey || '',
+        labelAr: item.labelAr || '',
+        labelEn: item.labelEn || '',
+        enabled: Boolean(item.enabled),
+        from: item.from || '10:00',
+        to: item.to || '17:00'
+      }))
+    : current.workingHours;
   current.images = { ...current.images.toObject?.(), ...(payload.images || {}) };
   current.copyOverrides = {
     ar: { ...(current.copyOverrides?.ar || {}), ...(payload.copyOverrides?.ar || {}) },
@@ -839,6 +881,8 @@ router.post('/upload', upload.single('image'), async (req, res) => {
     ? 'doctors'
     : req.body.type === 'settings'
       ? 'settings'
+      : req.body.type === 'cases'
+        ? 'cases'
       : 'services';
   const result = await uploadBufferToCloudinary(req.file.buffer, {
     folder: `elora/${folderType}`,
@@ -876,6 +920,86 @@ router.patch('/doctors/:id', async (req, res) => {
 router.delete('/doctors/:id', async (req, res) => {
   if (isDoctorUser(req.user)) return res.status(403).json({ message: 'Forbidden' });
   await Doctor.findByIdAndDelete(req.params.id);
+  res.json({ ok: true });
+});
+
+router.get('/cases', async (req, res) => {
+  const query = {};
+  if (req.query.service && req.query.service !== 'all') query.service = req.query.service;
+  if (req.query.published === 'true') query.published = true;
+  if (req.query.published === 'false') query.published = false;
+  if (req.query.search) {
+    const safe = String(req.query.search).trim();
+    query.$or = [
+      { title: { $regex: safe, $options: 'i' } },
+      { titleAr: { $regex: safe, $options: 'i' } },
+      { shortDescription: { $regex: safe, $options: 'i' } },
+      { shortDescriptionAr: { $regex: safe, $options: 'i' } }
+    ];
+  }
+
+  const cases = await TreatmentCase.find(query)
+    .populate('service doctor')
+    .sort({ service: 1, displayOrder: 1, caseDate: -1, createdAt: -1 });
+
+  res.json(cases);
+});
+
+router.post('/cases', async (req, res) => {
+  const payload = treatmentCaseSchema.parse(req.body || {});
+  const treatmentCase = await TreatmentCase.create(payload);
+
+  await createActivityLog({
+    actor: req.user,
+    actionType: 'treatment_case_created',
+    entityType: 'TreatmentCase',
+    entityId: treatmentCase._id,
+    summary: `Treatment case created: ${treatmentCase.title}`,
+    newData: treatmentCase.toObject()
+  });
+
+  res.status(201).json(await TreatmentCase.findById(treatmentCase._id).populate('service doctor'));
+});
+
+router.patch('/cases/:id', async (req, res) => {
+  const payload = treatmentCaseSchema.partial().parse(req.body || {});
+  const current = await TreatmentCase.findById(req.params.id);
+  if (!current) {
+    return res.status(404).json({ message: 'Case not found' });
+  }
+  const previous = current.toObject();
+  Object.assign(current, payload);
+  await current.save();
+
+  await createActivityLog({
+    actor: req.user,
+    actionType: 'treatment_case_updated',
+    entityType: 'TreatmentCase',
+    entityId: current._id,
+    summary: `Treatment case updated: ${current.title}`,
+    oldData: previous,
+    newData: current.toObject()
+  });
+
+  res.json(await TreatmentCase.findById(current._id).populate('service doctor'));
+});
+
+router.delete('/cases/:id', async (req, res) => {
+  const current = await TreatmentCase.findById(req.params.id);
+  if (!current) {
+    return res.status(404).json({ message: 'Case not found' });
+  }
+  await current.deleteOne();
+
+  await createActivityLog({
+    actor: req.user,
+    actionType: 'treatment_case_deleted',
+    entityType: 'TreatmentCase',
+    entityId: req.params.id,
+    summary: `Treatment case deleted: ${current.title}`,
+    oldData: current.toObject()
+  });
+
   res.json({ ok: true });
 });
 
