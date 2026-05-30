@@ -21,6 +21,7 @@ const treatmentCaseSchema = new mongoose.Schema({
   beforeImages: { type: [String], default: [] },
   afterImages: { type: [String], default: [] },
   galleryImages: { type: [String], default: [] },
+  videos: { type: [String], default: [] },
   caseDate: { type: String, default: '' },
   published: { type: Boolean, default: true },
   displayOrder: { type: Number, default: 0 }

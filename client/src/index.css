@@ -73,6 +73,47 @@ select.input:required:invalid {
   color: white;
 }
 .btn-dark:hover { background: rgba(255,255,255,0.1); }
+.btn-dark-glow {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: rgba(242,211,141,0.22);
+  box-shadow:
+    0 0 0 1px rgba(242,211,141,0.08),
+    0 0 26px rgba(242,211,141,0.1);
+}
+.btn-dark-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 9999px;
+  background: conic-gradient(
+    from 0deg,
+    rgba(242,211,141,0) 0deg,
+    rgba(242,211,141,0.9) 55deg,
+    rgba(255,244,214,0.95) 80deg,
+    rgba(242,211,141,0) 110deg,
+    rgba(242,211,141,0) 360deg
+  );
+  filter: blur(4px);
+  opacity: 0.95;
+  animation: buttonGlowOrbit 4.8s linear infinite;
+  z-index: -2;
+}
+.btn-dark-glow::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 9999px;
+  background: linear-gradient(145deg, rgba(33,27,28,0.96), rgba(56,45,41,0.88));
+  z-index: -1;
+}
+.btn-dark-glow:hover {
+  background: transparent;
+  box-shadow:
+    0 0 0 1px rgba(242,211,141,0.12),
+    0 0 34px rgba(242,211,141,0.16);
+}
 .nav-link {
   @apply rounded-full px-4 py-2 text-sm transition;
   color: rgba(255,255,255,0.72);
@@ -178,6 +219,14 @@ select.input:required:invalid {
   z-index: 1;
 }
 @keyframes logoOrbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes buttonGlowOrbit {
   from {
     transform: rotate(0deg);
   }

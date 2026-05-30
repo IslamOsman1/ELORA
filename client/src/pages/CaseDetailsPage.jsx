@@ -1,6 +1,6 @@
 import React from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, ChevronLeft, ChevronRight, Clock3, Expand, Image as ImageIcon } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Clock3, Expand, Image as ImageIcon, PlayCircle } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import PageHero from '../components/common/PageHero';
 import TreatmentCaseCard from '../components/public/TreatmentCaseCard';
@@ -59,6 +59,7 @@ export default function CaseDetailsPage() {
   const treatmentSteps = language === 'ar' && caseData?.treatmentStepsAr?.length ? caseData.treatmentStepsAr : (caseData?.treatmentSteps || []);
   const beforeImage = caseData?.beforeImages?.[0];
   const afterImage = caseData?.afterImages?.[0];
+  const videos = caseData?.videos || [];
 
   if (loading) {
     return <main className="grid min-h-screen place-items-center px-4 text-white/70">{isArabic ? 'جارٍ تحميل الحالة...' : 'Loading case...'}</main>;
@@ -185,6 +186,37 @@ export default function CaseDetailsPage() {
                 ))}
               </div>
             </article>
+
+            {videos.length ? (
+              <article className="premium-card p-6 sm:p-8">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.24em] text-[#f2d38d]">{isArabic ? 'فيديوهات قصيرة' : 'Short videos'}</p>
+                    <h2 className="mt-2 text-2xl font-semibold text-white">{isArabic ? 'فيديوهات الحالة' : 'Case videos'}</h2>
+                  </div>
+                  <div className="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs text-white/55">
+                    {videos.length} {isArabic ? 'فيديو' : 'videos'}
+                  </div>
+                </div>
+                <div className="mt-6 grid gap-4 lg:grid-cols-2">
+                  {videos.map((video, index) => (
+                    <div key={`${video}-${index}`} className="overflow-hidden rounded-[1.6rem] border border-white/10 bg-white/[0.03]">
+                      <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3 text-sm text-white/70">
+                        <PlayCircle size={16} className="text-[#f2d38d]" />
+                        <span>{isArabic ? `فيديو ${index + 1}` : `Video ${index + 1}`}</span>
+                      </div>
+                      <video
+                        controls
+                        preload="metadata"
+                        playsInline
+                        className="h-72 w-full bg-black object-cover"
+                        src={video}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </article>
+            ) : null}
           </div>
 
           <aside className="grid gap-4 self-start">

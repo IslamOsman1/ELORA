@@ -1,6 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { Calendar, CheckCircle2, ShieldCheck, Sparkles, Stethoscope } from 'lucide-react';
+import { Calendar, CheckCircle2, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { api } from '../utils/api';
@@ -86,6 +86,10 @@ export default function HomePage() {
   const homeFeaturesTitle = getText(language, 'home.featuresTitle', t('home.featuresTitle'));
   const homeShowcaseText = getText(language, 'home.showcaseText', t('home.showcaseText'));
   const logoUrl = branding.logoUrl || '/logo.jpg';
+  const treatedCasesCardImage = getImage(
+    'homeTreatedCasesCardImage',
+    '/trr.png'
+  );
 
   useEffect(() => {
     api.get('/services').then((response) => setServices(response.data.slice(0, 3)));
@@ -151,12 +155,26 @@ export default function HomePage() {
                     </div>
                   </div>
                   <div className="mt-5 grid grid-cols-[1.1fr_.9fr] gap-3">
-                    <div className="rounded-[1.4rem] border border-[#f2d38d]/18 bg-white/[0.04] p-4">
-                      <p className="text-[0.64rem] uppercase tracking-[0.24em] text-white/40">Esthetics | التجميل</p>
-                      <p className="mt-3 text-lg font-semibold text-white">تصميم وتجميل الابتسامة</p>
-                      <p className="mt-1 text-[0.72rem] text-[#f2d38d]">Smile Design</p>
-                      <p className="mt-2 text-[0.72rem] leading-5 text-white/55">خطط علاجية لتحسين اللون، التناسق، وإبراز جمال الابتسامة بشكل طبيعي.</p>
-                    </div>
+                    <Link
+                      to="/cases"
+                      className="group relative block overflow-hidden rounded-[1.4rem] border border-[#f2d38d]/18 bg-white/[0.04]"
+                      aria-label={language === 'ar' ? 'عرض الحالات المعالجة' : 'View treated cases'}
+                    >
+                      <img
+                        src={treatedCasesCardImage}
+                        alt={language === 'ar' ? 'الحالات المعالجة' : 'Treated cases'}
+                        className="h-full min-h-[11.5rem] w-full object-cover transition duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#120f0d]/88 via-[#120f0d]/18 to-transparent" />
+                      <div className="absolute inset-x-0 bottom-0 p-4">
+                        <p className="text-[0.64rem] uppercase tracking-[0.24em] text-[#f2d38d]">
+                          {language === 'ar' ? 'الحالات المعالجة' : 'Treated Cases'}
+                        </p>
+                        <p className="mt-2 text-sm font-semibold text-white">
+                          {language === 'ar' ? 'اضغط لعرض الحالات المعالجة' : 'Tap to view treated cases'}
+                        </p>
+                      </div>
+                    </Link>
                     <div className="grid gap-3">
                       <div className="rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-3">
                         <p className="text-[0.62rem] uppercase tracking-[0.22em] text-white/40">Care | الرعاية</p>
@@ -190,7 +208,7 @@ export default function HomePage() {
             </div>
             <div className="mt-5 grid gap-3 sm:mt-8 sm:flex sm:flex-wrap">
               <Link to="/booking" className="btn-gold inline-flex items-center justify-center gap-2 !px-4 !py-3 text-sm sm:!px-6 sm:!py-3 sm:text-base"><Calendar size={16} />{t('home.primaryCta')}</Link>
-              <Link to="/about" className="btn-dark !px-4 !py-3 text-center text-sm sm:!px-6 sm:!py-3 sm:text-base">{t('home.secondaryCta')}</Link>
+              <Link to="/doctors" className="btn-dark btn-dark-glow !px-4 !py-3 text-center text-sm sm:!px-6 sm:!py-3 sm:text-base">{t('home.secondaryCta')}</Link>
             </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7 }} className="relative z-10 hidden lg:block">
@@ -201,17 +219,7 @@ export default function HomePage() {
             </div>
           </motion.div>
         </div>
-        <div className="mx-auto max-w-7xl px-4 pt-4 sm:pt-8">
-          <div className="grid w-full gap-3 md:grid-cols-3 md:gap-4">
-            {[Sparkles, ShieldCheck, Stethoscope].map((Icon, index) => (
-              <div key={index} className="rounded-[1.2rem] border border-white/10 bg-white/[0.04] p-3 sm:rounded-[1.8rem] sm:p-5">
-                <Icon className="h-4 w-4 text-[#f2d38d] sm:h-6 sm:w-6" />
-                <p className="mt-2 text-[0.72rem] leading-5 text-white/65 sm:mt-4 sm:text-sm sm:leading-7">{t('home.features')[index]}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="mx-auto max-w-7xl px-4 pb-12 pt-4 sm:pb-16 sm:pt-8 md:pb-20">
+        <div className="mx-auto max-w-7xl px-4 pb-12 pt-6 sm:pb-16 sm:pt-10 md:pb-20">
           <div className="grid w-full grid-cols-3 gap-2 sm:gap-4">
             {t('home.stats').map((stat) => (
               <div key={stat.label} className="premium-card min-w-0 p-3 text-center sm:p-5">

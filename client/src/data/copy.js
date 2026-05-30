@@ -39,7 +39,7 @@ export const copy = {
       title: 'طب أسنان تجميلي وعلاجي بخبرة تركز على راحتك ونتيجتك',
       description: 'في إيلورا نعتني بتفاصيل الابتسامة من الفحص الأول وحتى خطة العلاج، مع حجز واضح، شرح صادق، وبيئة علاجية مريحة.',
       primaryCta: 'احجز استشارتك',
-      secondaryCta: 'تعرّف على العيادة',
+      secondaryCta: 'الفريق الطبي',
       stats: [
         { value: '12+', label: 'سنوات خبرة' },
         { value: '18K+', label: 'حالة تم علاجها' },
@@ -227,7 +227,7 @@ export const copy = {
       title: 'Esthetic and restorative dental care built around comfort and trust',
       description: 'At ELORA, every treatment journey begins with clear diagnosis, honest guidance, and a calm clinic experience focused on lasting results.',
       primaryCta: 'Book your consultation',
-      secondaryCta: 'About the clinic',
+      secondaryCta: 'Medical team',
       stats: [
         { value: '12+', label: 'Years of experience' },
         { value: '18K+', label: 'Cases treated' },

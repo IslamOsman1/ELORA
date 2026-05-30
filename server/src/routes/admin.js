@@ -24,7 +24,7 @@ import { createActivityLog } from '../utils/activity.js';
 const router = express.Router();
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }
+  limits: { fileSize: 50 * 1024 * 1024 }
 });
 
 const medicalSessionSchema = z.object({
@@ -68,6 +68,7 @@ const treatmentCaseSchema = z.object({
   beforeImages: z.array(z.string()).optional(),
   afterImages: z.array(z.string()).optional(),
   galleryImages: z.array(z.string()).optional(),
+  videos: z.array(z.string()).optional(),
   caseDate: z.string().optional(),
   published: z.boolean().optional(),
   displayOrder: z.coerce.number().optional()
@@ -874,7 +875,7 @@ router.post('/upload', upload.single('image'), async (req, res) => {
     return res.status(500).json({ message: 'Cloudinary is not configured on the server.' });
   }
   if (!req.file) {
-    return res.status(400).json({ message: 'Image file is required.' });
+    return res.status(400).json({ message: 'Media file is required.' });
   }
 
   const folderType = req.body.type === 'doctors'
@@ -884,14 +885,16 @@ router.post('/upload', upload.single('image'), async (req, res) => {
       : req.body.type === 'cases'
         ? 'cases'
       : 'services';
+  const requestedResourceType = req.body.resourceType === 'video' ? 'video' : 'image';
   const result = await uploadBufferToCloudinary(req.file.buffer, {
     folder: `elora/${folderType}`,
-    resource_type: 'image'
+    resource_type: requestedResourceType
   });
 
   res.status(201).json({
     url: result.secure_url,
-    publicId: result.public_id
+    publicId: result.public_id,
+    resourceType: requestedResourceType
   });
 });
 

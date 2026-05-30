@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, PlayCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 import { localizedField } from '../../utils/content';
@@ -37,6 +37,12 @@ export default function TreatmentCaseCard({ treatmentCase, className = '' }) {
             className="h-56 w-full object-cover transition duration-500 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0f0b0f] via-[#0f0b0f]/15 to-transparent" />
+          {treatmentCase.videos?.length ? (
+            <div className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-1.5 text-xs text-white/90 backdrop-blur">
+              <PlayCircle size={14} className="text-[#f2d38d]" />
+              <span>{isArabic ? 'فيديو' : 'Video'}</span>
+            </div>
+          ) : null}
           <div className="absolute inset-x-0 bottom-0 p-5">
             <p className="text-xs uppercase tracking-[0.22em] text-[#f2d38d]">
               {localizedField(treatmentCase.service || {}, language, 'title') || (isArabic ? 'حالة علاج' : 'Treatment case')}

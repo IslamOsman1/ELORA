@@ -95,6 +95,7 @@ const caseInitial = {
   beforeImagesText: '',
   afterImagesText: '',
   galleryImagesText: '',
+  videosText: '',
   caseDate: '',
   published: true,
   displayOrder: 0
@@ -357,6 +358,7 @@ export default function AdminDashboardPage() {
       beforeImagesText: arrayToLines(item.beforeImages),
       afterImagesText: arrayToLines(item.afterImages),
       galleryImagesText: arrayToLines(item.galleryImages),
+      videosText: arrayToLines(item.videos),
       caseDate: item.caseDate || '',
       published: Boolean(item.published),
       displayOrder: item.displayOrder || 0
@@ -364,10 +366,11 @@ export default function AdminDashboardPage() {
     setTab('cases');
   }
 
-  async function uploadImage(file, type) {
+  async function uploadMedia(file, type, resourceType = 'image') {
     const formData = new FormData();
     formData.append('image', file);
     formData.append('type', type);
+    formData.append('resourceType', resourceType);
     const response = await api.post('/admin/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
     return response.data.url;
   }
@@ -376,7 +379,7 @@ export default function AdminDashboardPage() {
     const file = event.target.files?.[0];
     if (!file) return;
     try {
-      const imageUrl = await uploadImage(file, 'services');
+      const imageUrl = await uploadMedia(file, 'services');
       setServiceForm((current) => ({ ...current, image: imageUrl }));
       toast.success(isArabic ? 'تم رفع الصورة' : 'Image uploaded');
     } catch (error) {
@@ -390,7 +393,7 @@ export default function AdminDashboardPage() {
     const file = event.target.files?.[0];
     if (!file) return;
     try {
-      const imageUrl = await uploadImage(file, 'doctors');
+      const imageUrl = await uploadMedia(file, 'doctors');
       setDoctorForm((current) => ({ ...current, image: imageUrl }));
       toast.success(isArabic ? 'تم رفع الصورة' : 'Image uploaded');
     } catch (error) {
@@ -404,7 +407,7 @@ export default function AdminDashboardPage() {
     const file = event.target.files?.[0];
     if (!file) return;
     try {
-      const imageUrl = await uploadImage(file, 'cases');
+      const imageUrl = await uploadMedia(file, 'cases', 'image');
       setCaseForm((current) => {
         if (field === 'mainImage') {
           return { ...current, mainImage: imageUrl };
@@ -415,6 +418,23 @@ export default function AdminDashboardPage() {
       toast.success(isArabic ? 'تم رفع الصورة' : 'Image uploaded');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Image upload failed');
+    } finally {
+      event.target.value = '';
+    }
+  }
+
+  async function handleCaseVideoUpload(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const videoUrl = await uploadMedia(file, 'cases', 'video');
+      setCaseForm((current) => {
+        const currentLines = linesToArray(current.videosText);
+        return { ...current, videosText: [...currentLines, videoUrl].join('\n') };
+      });
+      toast.success(isArabic ? 'تم رفع الفيديو' : 'Video uploaded');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Video upload failed');
     } finally {
       event.target.value = '';
     }
@@ -485,6 +505,7 @@ export default function AdminDashboardPage() {
       beforeImages: linesToArray(caseForm.beforeImagesText),
       afterImages: linesToArray(caseForm.afterImagesText),
       galleryImages: linesToArray(caseForm.galleryImagesText),
+      videos: linesToArray(caseForm.videosText),
       caseDate: caseForm.caseDate,
       published: Boolean(caseForm.published),
       displayOrder: Number(caseForm.displayOrder || 0)
@@ -1019,8 +1040,8 @@ export default function AdminDashboardPage() {
                 <textarea className="input" rows="3" placeholder="Arabic result summary" value={caseForm.resultSummaryAr} onChange={(event) => setCaseForm({ ...caseForm, resultSummaryAr: event.target.value })} />
                 <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4 text-sm text-white/65">
                   {isArabic
-                    ? 'أضف صورة الكارت الرئيسية، ثم صور قبل العلاج وبعده، وبعد ذلك أي صور إضافية للمعرض.'
-                    : 'Add the main card image, then before/after images, then any extra gallery images.'}
+                    ? 'أضف صورة الكارت الرئيسية، ثم صور قبل العلاج وبعده، وبعد ذلك أي صور إضافية للمعرض. يمكنك أيضًا إضافة فيديوهات قصيرة للحالة.'
+                    : 'Add the main card image, then before/after images, then any extra gallery images. You can also add short case videos.'}
                 </div>
                 <input className="input" placeholder="Main image URL" value={caseForm.mainImage} onChange={(event) => setCaseForm({ ...caseForm, mainImage: event.target.value })} />
                 <input className="input" type="file" accept="image/*" onChange={(event) => handleCaseImageUpload(event, 'mainImage')} />
@@ -1030,6 +1051,8 @@ export default function AdminDashboardPage() {
                 <input className="input" type="file" accept="image/*" onChange={(event) => handleCaseImageUpload(event, 'afterImagesText')} />
                 <textarea className="input" rows="3" placeholder="Gallery images URLs (one per line)" value={caseForm.galleryImagesText} onChange={(event) => setCaseForm({ ...caseForm, galleryImagesText: event.target.value })} />
                 <input className="input" type="file" accept="image/*" onChange={(event) => handleCaseImageUpload(event, 'galleryImagesText')} />
+                <textarea className="input" rows="3" placeholder="Short videos URLs (one per line)" value={caseForm.videosText} onChange={(event) => setCaseForm({ ...caseForm, videosText: event.target.value })} />
+                <input className="input" type="file" accept="video/mp4,video/webm,video/quicktime" onChange={handleCaseVideoUpload} />
                 <div className="rounded-[1.4rem] border border-white/10 bg-white/[0.03] p-4 text-sm text-white/65">
                   {isArabic
                     ? 'يمكنك تحديد تاريخ الحالة وترتيب ظهورها، ثم اختيار نشرها بالموقع أو إبقائها مخفية.'
