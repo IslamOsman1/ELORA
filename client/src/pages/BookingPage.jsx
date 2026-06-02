@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Navigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import PageHero from '../components/common/PageHero';
 import SectionHeading from '../components/common/SectionHeading';
 import { api } from '../utils/api';
@@ -28,7 +28,7 @@ function getTodayDateString() {
 export default function BookingPage() {
   const { t, language } = useLanguage();
   const location = useLocation();
-  const { user, isAuthenticated, loading } = useCustomerAuth();
+  const { user, isAuthenticated } = useCustomerAuth();
   const { branding, contact, getImage, getText } = useSiteSettings();
   const today = getTodayDateString();
   const [services, setServices] = useState([]);
@@ -46,10 +46,9 @@ export default function BookingPage() {
   }, [user]);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
     api.get('/services').then((response) => setServices(response.data));
     api.get('/doctors').then((response) => setDoctors(response.data));
-  }, [isAuthenticated]);
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -64,9 +63,9 @@ export default function BookingPage() {
   }, [location.search]);
 
   useEffect(() => {
-    if (!isAuthenticated || !form.date) return;
+    if (!form.date) return;
     api.get('/slots', { params: { date: form.date, doctor: form.doctor } }).then((response) => setSlots(response.data)).catch(() => {});
-  }, [form.date, form.doctor, isAuthenticated]);
+  }, [form.date, form.doctor]);
 
   useEffect(() => {
     if (form.time && !slots.includes(form.time)) {
@@ -82,20 +81,12 @@ export default function BookingPage() {
     }
 
     try {
-      await api.post('/auth/customer/appointments', form);
+      await api.post(isAuthenticated ? '/auth/customer/appointments' : '/appointments', form);
       toast.success(t('booking.success'));
       setForm((current) => ({ ...initialForm, patientName: current.patientName, email: current.email }));
     } catch (error) {
       toast.error(error.response?.data?.message || t('booking.fail'));
     }
-  }
-
-  if (loading) {
-    return <main className="grid min-h-screen place-items-center px-4 text-white/70">{t('common.loading')}</main>;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/account/auth" replace state={{ mode: 'login', redirectTo: '/booking' }} />;
   }
 
   return (

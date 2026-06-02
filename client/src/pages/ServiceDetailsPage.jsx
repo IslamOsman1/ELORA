@@ -8,6 +8,7 @@ import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import { localizedField, serviceImage } from '../utils/content';
+import { formatPriceInEgp } from '../utils/currency';
 
 const icons = { Sparkles, ShieldCheck, Sun, Smile, HeartPulse, Baby };
 
@@ -64,6 +65,7 @@ export default function ServiceDetailsPage() {
   const title = localizedField(service, language, 'title');
   const description = localizedField(service, language, 'description');
   const banner = service.bannerImage || serviceImage(service);
+  const formattedPrice = formatPriceInEgp(service.priceFrom, language);
 
   return (
     <main>
@@ -114,7 +116,7 @@ export default function ServiceDetailsPage() {
                 </div>
                 <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
                   <p className="text-sm text-white/50">{isArabic ? 'السعر يبدأ من' : 'Starting from'}</p>
-                  <p className="mt-2 text-2xl font-semibold text-[#f2d38d]">${service.priceFrom}</p>
+                  <p className="mt-2 text-2xl font-semibold text-[#f2d38d]">{formattedPrice}</p>
                 </div>
                 <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
                   <p className="text-sm text-white/50">{isArabic ? 'عدد الحالات المنشورة' : 'Published cases'}</p>

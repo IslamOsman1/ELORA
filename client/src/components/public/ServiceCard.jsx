@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Sparkles, ShieldCheck, Sun, Smile, HeartPulse, Baby, ArrowRight, ChevronDown } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { localizedField, serviceImage } from '../../utils/content';
+import { formatPriceInEgp } from '../../utils/currency';
 
 const icons = { Sparkles, ShieldCheck, Sun, Smile, HeartPulse, Baby };
 
@@ -16,6 +17,7 @@ export default function ServiceCard({ service, compact = false, expandable = fal
   const description = localizedField(service, language, 'description');
   const detailsHref = `/services/${service._id}`;
   const bookingHref = `/booking?service=${service._id}`;
+  const formattedPrice = formatPriceInEgp(service.priceFrom, language);
 
   if (compact) {
     return (
@@ -92,7 +94,7 @@ export default function ServiceCard({ service, compact = false, expandable = fal
                 <p className="text-sm leading-7 text-white/68">{description}</p>
                 <div className="mt-4 flex flex-col gap-1 text-sm text-white/55 sm:flex-row sm:items-center sm:justify-between">
                   <span>{service.duration} {t('common.minutes')}</span>
-                  <span className="font-semibold text-[#f2d38d]">{t('common.from')} ${service.priceFrom}</span>
+                  <span className="font-semibold text-[#f2d38d]">{t('common.from')} {formattedPrice}</span>
                 </div>
                 <div className="mt-5 flex flex-col gap-2 sm:flex-row">
                   <Link to={detailsHref} className="btn-dark inline-flex items-center justify-center gap-2 text-sm">
@@ -136,7 +138,7 @@ export default function ServiceCard({ service, compact = false, expandable = fal
           </p>
           <div className="mt-3 flex flex-col gap-1 text-[0.72rem] text-white/55 sm:mt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-sm">
             <span>{service.duration} {t('common.minutes')}</span>
-            <span className="font-semibold text-[#f2d38d]">{t('common.from')} ${service.priceFrom}</span>
+            <span className="font-semibold text-[#f2d38d]">{t('common.from')} {formattedPrice}</span>
           </div>
         </div>
       </Link>
