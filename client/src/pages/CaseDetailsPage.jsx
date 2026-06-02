@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, ChevronLeft, ChevronRight, Clock3, Expand, Image as ImageIcon, PlayCircle } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import PageHero from '../components/common/PageHero';
+import Seo from '../components/common/Seo';
 import TreatmentCaseCard from '../components/public/TreatmentCaseCard';
 import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
@@ -81,6 +82,13 @@ export default function CaseDetailsPage() {
 
   return (
     <main>
+      <Seo
+        title={`${title} | ELORA`}
+        description={shortDescription || fullDescription || ''}
+        image={caseImage(caseData)}
+        path={`/cases/${caseId}`}
+        type="article"
+      />
       <PageHero
         eyebrow={localizedField(caseData.service || {}, language, 'title')}
         title={title}

@@ -30,6 +30,8 @@ export default function ServiceCard({ service, compact = false, expandable = fal
             <img
               src={serviceImage(service)}
               alt={title}
+              loading="lazy"
+              decoding="async"
               className="h-44 w-full object-cover transition duration-500 group-hover:scale-110"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#110d10] via-[#110d10]/20 to-transparent" />
@@ -62,6 +64,8 @@ export default function ServiceCard({ service, compact = false, expandable = fal
             <img
               src={serviceImage(service)}
               alt={title}
+              loading="lazy"
+              decoding="async"
               className="h-52 w-full object-cover transition duration-500 group-hover:scale-110"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0f0b0f] via-[#0f0b0f]/18 to-transparent" />
@@ -125,6 +129,8 @@ export default function ServiceCard({ service, compact = false, expandable = fal
           <img
             src={serviceImage(service)}
             alt={title}
+            loading="lazy"
+            decoding="async"
             className="h-28 w-full object-cover transition duration-500 group-hover:scale-110 sm:h-52"
           />
         </div>

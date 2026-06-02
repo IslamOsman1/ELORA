@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import PageHero from '../components/common/PageHero';
 import SectionHeading from '../components/common/SectionHeading';
+import Seo from '../components/common/Seo';
 import ServiceCard from '../components/public/ServiceCard';
 import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
@@ -33,6 +34,8 @@ function MobileServiceTile({ service }) {
           <motion.img
             src={serviceImage(service)}
             alt={localizedField(service, language, 'title')}
+            loading="lazy"
+            decoding="async"
             className="h-44 w-full object-cover"
             initial={{ scale: 1.16, filter: 'saturate(0.8) brightness(0.75)' }}
             whileInView={{ scale: 1, filter: 'saturate(1) brightness(1)' }}
@@ -73,6 +76,9 @@ export default function ServicesPage() {
   const { t, language, isArabic } = useLanguage();
   const { branding, getImage, getText } = useSiteSettings();
   const [services, setServices] = useState([]);
+  const heroTitle = getText(language, 'services.heroTitle', t('services.heroTitle'));
+  const heroText = getText(language, 'services.heroText', t('services.heroText'));
+  const heroImage = getImage('servicesHero', 'https://images.unsplash.com/photo-1606265752439-1f18756aa5fc?auto=format&fit=crop&w=1400&q=80');
 
   useEffect(() => {
     api.get('/services').then((response) => setServices(response.data));
@@ -80,11 +86,17 @@ export default function ServicesPage() {
 
   return (
     <main>
+      <Seo
+        title={`${branding.brandName || 'ELORA'} | ${heroTitle}`}
+        description={heroText}
+        image={heroImage}
+        path="/services"
+      />
       <PageHero
         eyebrow={branding.brandName || 'ELORA'}
-        title={getText(language, 'services.heroTitle', t('services.heroTitle'))}
-        text={getText(language, 'services.heroText', t('services.heroText'))}
-        image={getImage('servicesHero', 'https://images.unsplash.com/photo-1606265752439-1f18756aa5fc?auto=format&fit=crop&w=1400&q=80')}
+        title={heroTitle}
+        text={heroText}
+        image={heroImage}
       />
       <section className="px-4 py-20">
         <SectionHeading eyebrow={t('nav.services')} title={t('services.sectionTitle')} text={t('services.sectionText')} />

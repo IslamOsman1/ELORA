@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { BadgeInfo, Building2, Contact, Info, Landmark, LocateFixed, Mail, MapPin, MapPinned, Phone, PhoneCall, Smartphone } from 'lucide-react';
 import PageHero from '../components/common/PageHero';
 import SectionHeading from '../components/common/SectionHeading';
+import Seo from '../components/common/Seo';
 import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 import { useSiteSettings } from '../context/SiteSettingsContext';
@@ -33,6 +34,9 @@ export default function ContactPage() {
   const { t, language } = useLanguage();
   const { branding, contact, getImage, getText } = useSiteSettings();
   const [form, setForm] = useState(initialForm);
+  const heroTitle = getText(language, 'contact.heroTitle', t('contact.heroTitle'));
+  const heroText = getText(language, 'contact.heroText', t('contact.heroText'));
+  const heroImage = getImage('contactHero', 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1400&q=80');
   const LocationIcon = resolveIcon(contact.locationIcon, MapPin);
   const PhoneIcon = resolveIcon(contact.phoneIcon, Phone);
   const EmailIcon = resolveIcon(contact.emailIcon, Mail);
@@ -53,11 +57,17 @@ export default function ContactPage() {
 
   return (
     <main>
+      <Seo
+        title={`${branding.brandName || 'ELORA'} | ${heroTitle}`}
+        description={heroText}
+        image={heroImage}
+        path="/contact"
+      />
       <PageHero
         eyebrow={branding.brandName || 'ELORA'}
-        title={getText(language, 'contact.heroTitle', t('contact.heroTitle'))}
-        text={getText(language, 'contact.heroText', t('contact.heroText'))}
-        image={getImage('contactHero', 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1400&q=80')}
+        title={heroTitle}
+        text={heroText}
+        image={heroImage}
       />
       <section className="px-4 py-20">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[.9fr_1.1fr]">

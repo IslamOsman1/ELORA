@@ -12,7 +12,7 @@ export default function PageHero({ eyebrow, title, text, image }) {
         </div>
         <div className="relative">
           <div className="absolute -inset-3 rounded-[2rem] bg-[#d8b66a]/20 blur-3xl sm:-inset-6 sm:rounded-[2.5rem]" />
-          <img src={image} alt={title} className="relative h-[220px] w-full rounded-[1.75rem] object-cover object-center shadow-2xl shadow-black/30 sm:h-[320px] sm:rounded-[2.25rem] lg:h-[360px]" />
+          <img src={image} alt={title} loading="eager" fetchPriority="high" decoding="async" className="relative h-[220px] w-full rounded-[1.75rem] object-cover object-center shadow-2xl shadow-black/30 sm:h-[320px] sm:rounded-[2.25rem] lg:h-[360px]" />
         </div>
       </div>
     </section>

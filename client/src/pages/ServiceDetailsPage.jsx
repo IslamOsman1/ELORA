@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowRight, Clock3, Sparkles, ShieldCheck, Sun, Smile, HeartPulse, Baby } from 'lucide-react';
 import PageHero from '../components/common/PageHero';
+import Seo from '../components/common/Seo';
 import TreatmentCaseCard from '../components/public/TreatmentCaseCard';
 import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
@@ -69,6 +70,13 @@ export default function ServiceDetailsPage() {
 
   return (
     <main>
+      <Seo
+        title={`${branding.brandName || 'ELORA'} | ${title}`}
+        description={description}
+        image={banner}
+        path={`/services/${serviceId}`}
+        type="article"
+      />
       <PageHero
         eyebrow={branding.brandName || 'ELORA'}
         title={title}

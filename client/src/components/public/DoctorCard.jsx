@@ -24,6 +24,8 @@ export default function DoctorCard({ doctor, compact = false, className = '' }) 
               <img
                 src={doctorImage(doctor)}
                 alt={doctor.name}
+                loading="lazy"
+                decoding="async"
                 className="h-full w-full object-contain object-bottom p-2 transition duration-500 group-hover:scale-105"
               />
             </div>
@@ -53,6 +55,8 @@ export default function DoctorCard({ doctor, compact = false, className = '' }) 
             <img
               src={doctorImage(doctor)}
               alt={doctor.name}
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-contain object-bottom p-3 transition duration-500 group-hover:scale-105"
             />
           </div>

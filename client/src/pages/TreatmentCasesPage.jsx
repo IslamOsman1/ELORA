@@ -2,6 +2,7 @@ import React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import PageHero from '../components/common/PageHero';
 import SectionHeading from '../components/common/SectionHeading';
+import Seo from '../components/common/Seo';
 import TreatmentCaseCard from '../components/public/TreatmentCaseCard';
 import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
@@ -36,6 +37,12 @@ export default function TreatmentCasesPage() {
 
   return (
     <main>
+      <Seo
+        title={`${branding.brandName || 'ELORA'} | ${isArabic ? 'حالات تم علاجها' : 'Treated Cases'}`}
+        description={isArabic ? 'استعرض حالات علاج منشورة ونتائج حقيقية من العيادة.' : 'Browse published treatment cases and real clinic results.'}
+        image={getImage('servicesHero', 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=1400&q=80')}
+        path="/cases"
+      />
       <PageHero
         eyebrow={branding.brandName || 'ELORA'}
         title={isArabic ? 'حالات تم علاجها' : 'Treated Cases'}

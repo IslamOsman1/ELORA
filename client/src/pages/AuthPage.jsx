@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import GoogleSignInButton from '../components/auth/GoogleSignInButton';
+import Seo from '../components/common/Seo';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -137,6 +138,12 @@ export default function AuthPage() {
 
   return (
     <main className="grid min-h-screen place-items-center px-4 py-10">
+      <Seo
+        title={`ELORA | ${text.title}`}
+        description={text.subtitle}
+        path="/account/auth"
+        noindex
+      />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(244,213,154,0.2),transparent_32%),radial-gradient(circle_at_bottom,rgba(98,65,35,0.32),transparent_38%)]" />
       <div className="premium-card relative w-full max-w-5xl overflow-hidden p-0 lg:grid lg:grid-cols-[1.05fr_0.95fr]">
         <section className="relative overflow-hidden border-b border-white/10 p-8 lg:border-b-0 lg:border-e">

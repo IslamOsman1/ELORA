@@ -2,6 +2,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import PageHero from '../components/common/PageHero';
 import SectionHeading from '../components/common/SectionHeading';
+import Seo from '../components/common/Seo';
 import DoctorCard from '../components/public/DoctorCard';
 import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
@@ -11,6 +12,9 @@ export default function DoctorsPage() {
   const { t, language, isArabic } = useLanguage();
   const { branding, getImage, getText } = useSiteSettings();
   const [doctors, setDoctors] = useState([]);
+  const heroTitle = getText(language, 'doctors.heroTitle', t('doctors.heroTitle'));
+  const heroText = getText(language, 'doctors.heroText', t('doctors.heroText'));
+  const heroImage = getImage('doctorsHero', 'https://images.unsplash.com/photo-1666214280391-8ff5bd3c0bf0?auto=format&fit=crop&w=1400&q=80');
 
   useEffect(() => {
     api.get('/doctors').then((response) => setDoctors(response.data));
@@ -18,11 +22,17 @@ export default function DoctorsPage() {
 
   return (
     <main>
+      <Seo
+        title={`${branding.brandName || 'ELORA'} | ${heroTitle}`}
+        description={heroText}
+        image={heroImage}
+        path="/doctors"
+      />
       <PageHero
         eyebrow={branding.brandName || 'ELORA'}
-        title={getText(language, 'doctors.heroTitle', t('doctors.heroTitle'))}
-        text={getText(language, 'doctors.heroText', t('doctors.heroText'))}
-        image={getImage('doctorsHero', 'https://images.unsplash.com/photo-1666214280391-8ff5bd3c0bf0?auto=format&fit=crop&w=1400&q=80')}
+        title={heroTitle}
+        text={heroText}
+        image={heroImage}
       />
       <section className="px-4 py-20">
         <SectionHeading eyebrow={t('nav.doctors')} title={t('doctors.sectionTitle')} text={t('doctors.sectionText')} />

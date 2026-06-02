@@ -7,6 +7,7 @@ import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import SectionHeading from '../components/common/SectionHeading';
+import Seo from '../components/common/Seo';
 import ServiceCard from '../components/public/ServiceCard';
 import DoctorCard from '../components/public/DoctorCard';
 
@@ -70,7 +71,7 @@ function DentalHeroAnimation() {
 
 export default function HomePage() {
   const { t, language } = useLanguage();
-  const { branding, getImage, getText } = useSiteSettings();
+  const { branding, contact, getImage, getText } = useSiteSettings();
   const [services, setServices] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const showcaseImages = getImage('homeShowcaseImages', [
@@ -90,6 +91,16 @@ export default function HomePage() {
     'homeTreatedCasesCardImage',
     '/trr.png'
   );
+  const seoJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Dentist',
+    name: brandName,
+    image: logoUrl,
+    telephone: contact.phone || undefined,
+    email: contact.email || undefined,
+    address: contact.location ? { '@type': 'PostalAddress', streetAddress: contact.location } : undefined,
+    url: typeof window !== 'undefined' ? window.location.origin : undefined
+  };
 
   useEffect(() => {
     api.get('/services').then((response) => setServices(response.data.slice(0, 3)));
@@ -98,6 +109,13 @@ export default function HomePage() {
 
   return (
     <main>
+      <Seo
+        title={`${brandName} | ${homeTitle}`}
+        description={homeDescription}
+        image={showcaseImages[0] || logoUrl}
+        path="/"
+        jsonLd={seoJsonLd}
+      />
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(244,213,154,0.24),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(96,54,31,0.38),transparent_35%)]" />
         <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center">
@@ -140,6 +158,9 @@ export default function HomePage() {
                       <img
                         src={showcaseImages[0]}
                         alt="Clear aligner smile"
+                        loading="eager"
+                        fetchPriority="high"
+                        decoding="async"
                         className="h-32 w-full object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#120f0d]/72 via-transparent to-transparent" />
@@ -214,8 +235,8 @@ export default function HomePage() {
           <motion.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.7 }} className="relative z-10 hidden lg:block">
             <DentalHeroAnimation />
             <div className="hidden content-start gap-4 sm:grid sm:grid-cols-2">
-              <img src={showcaseImages[0]} alt="Clinic interior" className="h-[280px] w-full rounded-[2.25rem] object-cover" />
-              <img src={showcaseImages[1]} alt="Dental treatment" className="mt-10 h-[280px] w-full rounded-[2.25rem] object-cover" />
+              <img src={showcaseImages[0]} alt="Clinic interior" loading="eager" fetchPriority="high" decoding="async" className="h-[280px] w-full rounded-[2.25rem] object-cover" />
+              <img src={showcaseImages[1]} alt="Dental treatment" loading="lazy" decoding="async" className="mt-10 h-[280px] w-full rounded-[2.25rem] object-cover" />
             </div>
           </motion.div>
         </div>
@@ -236,7 +257,7 @@ export default function HomePage() {
         <div className="scrollbar-hide mx-auto flex max-w-7xl snap-x snap-mandatory gap-4 overflow-x-auto pb-3">
           {showcaseImages.map((image, index) => (
             <article key={image} className="premium-card min-w-[78vw] snap-start overflow-hidden sm:min-w-[24rem] lg:min-w-[28rem]">
-              <img src={image} alt={`Showcase ${index + 1}`} className="h-32 w-full object-cover sm:h-64" />
+              <img src={image} alt={`Showcase ${index + 1}`} loading="lazy" decoding="async" className="h-32 w-full object-cover sm:h-64" />
               <div className="p-3 sm:p-6">
                 <div className="inline-flex items-center gap-2 text-[0.72rem] text-[#f2d38d] sm:text-sm"><CheckCircle2 size={14} /> {brandName}</div>
                 <h3 className="mt-3 text-lg font-semibold sm:mt-4 sm:text-2xl">{t('home.features')[index]}</h3>

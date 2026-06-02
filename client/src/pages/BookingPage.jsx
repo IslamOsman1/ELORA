@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
 import PageHero from '../components/common/PageHero';
 import SectionHeading from '../components/common/SectionHeading';
+import Seo from '../components/common/Seo';
 import { api } from '../utils/api';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -35,6 +36,9 @@ export default function BookingPage() {
   const [doctors, setDoctors] = useState([]);
   const [slots, setSlots] = useState(['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '14:00', '14:30', '15:00', '15:30', '16:00']);
   const [form, setForm] = useState(initialForm);
+  const heroTitle = getText(language, 'booking.heroTitle', t('booking.heroTitle'));
+  const heroText = getText(language, 'booking.heroText', t('booking.heroText'));
+  const heroImage = getImage('bookingHero', 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=1400&q=80');
 
   useEffect(() => {
     if (!user) return;
@@ -91,11 +95,17 @@ export default function BookingPage() {
 
   return (
     <main>
+      <Seo
+        title={`${branding.brandName || 'ELORA'} | ${heroTitle}`}
+        description={heroText}
+        image={heroImage}
+        path="/booking"
+      />
       <PageHero
         eyebrow={branding.brandName || 'ELORA'}
-        title={getText(language, 'booking.heroTitle', t('booking.heroTitle'))}
-        text={getText(language, 'booking.heroText', t('booking.heroText'))}
-        image={getImage('bookingHero', 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=1400&q=80')}
+        title={heroTitle}
+        text={heroText}
+        image={heroImage}
       />
       <section className="px-4 py-20">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[.9fr_1.1fr]">

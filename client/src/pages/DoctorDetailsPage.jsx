@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Award, CalendarDays } from 'lucide-react';
 import PageHero from '../components/common/PageHero';
 import SectionHeading from '../components/common/SectionHeading';
+import Seo from '../components/common/Seo';
 import TreatmentCaseCard from '../components/public/TreatmentCaseCard';
 import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
@@ -57,6 +58,13 @@ export default function DoctorDetailsPage() {
 
   return (
     <main>
+      <Seo
+        title={`${branding.brandName || 'ELORA'} | ${doctor.name}`}
+        description={bio || specialty}
+        image={doctorImage(doctor)}
+        path={`/doctors/${doctorId}`}
+        type="profile"
+      />
       <PageHero
         eyebrow={branding.brandName || 'ELORA'}
         title={doctor.name}
