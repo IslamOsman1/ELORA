@@ -27,6 +27,7 @@ import { clearAdminToken } from '../utils/auth';
 import SiteSettingsPanel from '../components/admin/SiteSettingsPanel';
 import WorkingHoursPanel from '../components/admin/WorkingHoursPanel';
 import ContactSettingsPanel from '../components/admin/ContactSettingsPanel';
+import SecuritySettingsPanel from '../components/admin/SecuritySettingsPanel';
 import { appointmentStatusMeta, formatDisplayDate, formatDisplayDateTime, getStatusMeta, medicalSessionStatusMeta } from '../utils/patient';
 
 const serviceInitial = {
@@ -173,6 +174,7 @@ export default function AdminDashboardPage() {
     doctors: isArabic ? 'الأطباء' : 'Doctors',
     messages: isArabic ? 'الرسائل' : 'Messages',
     settings: isArabic ? 'إعدادات الموقع' : 'Site settings',
+    security: isArabic ? 'الأمان' : 'Security',
     activity: isArabic ? 'سجل النشاط' : 'Activity logs',
     patient: isArabic ? 'المريض' : 'Patient',
     doctor: isArabic ? 'الطبيب' : 'Doctor',
@@ -193,6 +195,7 @@ export default function AdminDashboardPage() {
     ['messages', labels.messages],
     ['contact_settings', isArabic ? 'التواصل' : 'Contact'],
     ['working_hours', isArabic ? 'مواعيد العمل' : 'Working hours'],
+    ['security', labels.security],
     ['activity', labels.activity],
     ['settings', labels.settings]
   ];
@@ -1232,6 +1235,12 @@ export default function AdminDashboardPage() {
         {tab === 'settings' && (
           <AdminPanel title={labels.settings}>
             <SiteSettingsPanel />
+          </AdminPanel>
+        )}
+
+        {tab === 'security' && (
+          <AdminPanel title={labels.security}>
+            <SecuritySettingsPanel />
           </AdminPanel>
         )}
       </div>

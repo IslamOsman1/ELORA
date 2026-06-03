@@ -97,6 +97,7 @@ function normalizeUser(user) {
     id: user._id,
     name: user.name,
     email: user.email,
+    username: user.username || '',
     phone: user.phone || '',
     role: user.role,
     avatar: user.avatar || '',
@@ -134,14 +135,16 @@ async function verifyGoogleCredential(credential) {
 }
 
 router.post('/login', async (req, res) => {
-  const email = String(req.body?.email || '').trim().toLowerCase();
+  const identifier = String(req.body?.email || req.body?.identifier || '').trim().toLowerCase();
   const password = String(req.body?.password || '');
 
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required' });
+  if (!identifier || !password) {
+    return res.status(400).json({ message: 'Username/email and password are required' });
   }
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({
+    $or: [{ email: identifier }, { username: identifier }]
+  });
   if (!user || user.role !== 'admin' || !user.password || !(await bcrypt.compare(password, user.password))) {
     return res.status(401).json({ message: 'Invalid email or password' });
   }

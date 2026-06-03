@@ -20,6 +20,7 @@ PORT=5000
 MONGODB_URI=mongodb://127.0.0.1:27017/elora_dental
 JWT_SECRET=replace_with_long_random_secret
 CLIENT_URL=http://localhost:5173
+ADMIN_USERNAME=admin
 ADMIN_EMAIL=admin@elora.com
 ADMIN_PASSWORD=Admin@12345
 CLOUDINARY_CLOUD_NAME=your_cloud_name
@@ -58,6 +59,7 @@ This repo includes [render.yaml](./render.yaml) for the backend.
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_long_random_secret
 CLIENT_URL=https://your-vercel-domain.vercel.app
+ADMIN_USERNAME=admin
 ADMIN_EMAIL=admin@elora.com
 ADMIN_PASSWORD=your_admin_password
 CLOUDINARY_CLOUD_NAME=your_cloud_name

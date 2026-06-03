@@ -1,4 +1,5 @@
 import express from 'express';
+import bcrypt from 'bcryptjs';
 import multer from 'multer';
 import mongoose from 'mongoose';
 import { z } from 'zod';
@@ -72,6 +73,12 @@ const treatmentCaseSchema = z.object({
   caseDate: z.string().optional(),
   published: z.boolean().optional(),
   displayOrder: z.coerce.number().optional()
+});
+
+const adminSecuritySchema = z.object({
+  currentPassword: z.string().min(1),
+  email: z.string().email().optional(),
+  newPassword: z.string().min(6).optional()
 });
 
 function isDoctorUser(user) {
@@ -840,6 +847,65 @@ router.get('/activity-logs', async (req, res) => {
 
 router.get('/site-settings', async (req, res) => {
   res.json(await getOrCreateSiteSettings());
+});
+
+router.get('/security', async (req, res) => {
+  if (isDoctorUser(req.user)) return res.status(403).json({ message: 'Forbidden' });
+
+  const adminUser = await User.findById(req.user._id).select('name email username');
+  if (!adminUser) {
+    return res.status(404).json({ message: 'Admin user not found' });
+  }
+
+  res.json({
+    name: adminUser.name,
+    email: adminUser.email
+  });
+});
+
+router.patch('/security', async (req, res) => {
+  if (isDoctorUser(req.user)) return res.status(403).json({ message: 'Forbidden' });
+
+  const payload = adminSecuritySchema.parse(req.body || {});
+  const adminUser = await User.findById(req.user._id);
+  if (!adminUser || adminUser.role !== 'admin') {
+    return res.status(404).json({ message: 'Admin user not found' });
+  }
+
+  const passwordMatches = adminUser.password && await bcrypt.compare(payload.currentPassword, adminUser.password);
+  if (!passwordMatches) {
+    return res.status(400).json({ message: 'Current password is incorrect' });
+  }
+
+  const nextEmail = payload.email ? String(payload.email).trim().toLowerCase() : adminUser.email;
+  const wantsEmailChange = Boolean(payload.email) && nextEmail !== adminUser.email;
+  const wantsPasswordChange = Boolean(payload.newPassword);
+
+  if (!wantsEmailChange && !wantsPasswordChange) {
+    return res.status(400).json({ message: 'No security changes were provided' });
+  }
+
+  if (wantsEmailChange) {
+    const existingUser = await User.findOne({ email: nextEmail, _id: { $ne: adminUser._id } }).select('_id');
+    if (existingUser) {
+      return res.status(409).json({ message: 'This email is already in use' });
+    }
+    adminUser.email = nextEmail;
+  }
+
+  if (wantsPasswordChange) {
+    adminUser.password = await bcrypt.hash(payload.newPassword, 10);
+  }
+
+  await adminUser.save();
+
+  res.json({
+    message: 'Admin security settings updated successfully',
+    user: {
+      name: adminUser.name,
+      email: adminUser.email
+    }
+  });
 });
 
 router.put('/site-settings', async (req, res) => {

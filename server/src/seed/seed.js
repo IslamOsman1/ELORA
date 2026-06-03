@@ -15,6 +15,7 @@ await Doctor.deleteMany();
 await User.create({
   name: 'ELORA Admin',
   email: process.env.ADMIN_EMAIL || 'admin@elora.com',
+  username: process.env.ADMIN_USERNAME || 'admin',
   password: await bcrypt.hash(process.env.ADMIN_PASSWORD || 'Admin@12345', 10),
   role: 'admin'
 });

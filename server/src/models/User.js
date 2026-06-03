@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
+  username: { type: String, unique: true, sparse: true, lowercase: true, trim: true },
   password: { type: String },
   role: { type: String, enum: ['admin', 'doctor', 'customer'], default: 'customer' },
   doctorProfile: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor', default: null },

@@ -8,8 +8,8 @@ import { setAdminToken } from '../utils/auth';
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
-  const [email, setEmail] = useState('admin@elora.com');
+  const { t, isArabic } = useLanguage();
+  const [identifier, setIdentifier] = useState('admin');
   const [password, setPassword] = useState('Admin@12345');
   const [loading, setLoading] = useState(false);
 
@@ -17,7 +17,7 @@ export default function AdminLoginPage() {
     event.preventDefault();
     setLoading(true);
     try {
-      const response = await api.post('/auth/login', { email: email.trim(), password });
+      const response = await api.post('/auth/login', { identifier: identifier.trim(), password });
       setAdminToken(response.data.token);
       toast.success('Welcome back');
       navigate('/admin');
@@ -36,7 +36,7 @@ export default function AdminLoginPage() {
         <h1 className="mt-6 text-center font-display text-5xl">{t('admin.loginTitle')}</h1>
         <p className="mt-3 text-center text-white/60">{t('admin.loginText')}</p>
         <div className="mt-8 grid gap-4">
-          <input className="input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('admin.email')} />
+          <input className="input" value={identifier} onChange={(e) => setIdentifier(e.target.value)} placeholder={isArabic ? 'اسم المستخدم أو البريد' : 'Username or email'} />
           <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('admin.password')} />
           <button className="btn-gold mt-2 w-full" disabled={loading}>{loading ? t('admin.loggingIn') : t('admin.login')}</button>
           <Link className="text-center text-white/55 transition hover:text-white" to="/">{t('nav.home')}</Link>
