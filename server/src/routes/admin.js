@@ -21,6 +21,7 @@ import { getOrCreateSiteSettings } from '../utils/getSiteSettings.js';
 import { appointmentStatuses, canRequestCancellation, canRequestReschedule } from '../utils/booking.js';
 import { createNotification } from '../utils/notifications.js';
 import { createActivityLog } from '../utils/activity.js';
+import { syncAdminEnvFile } from '../utils/syncAdminEnv.js';
 
 const router = express.Router();
 const upload = multer({
@@ -909,6 +910,15 @@ router.patch('/security', async (req, res) => {
   }
 
   await adminUser.save();
+
+  try {
+    await syncAdminEnvFile({
+      email: wantsEmailChange ? adminUser.email : undefined,
+      password: wantsPasswordChange ? payload.newPassword : undefined
+    });
+  } catch (envError) {
+    console.error('Failed to sync admin credentials to .env:', envError.message);
+  }
 
   res.json({
     message: 'Admin security settings updated successfully',
