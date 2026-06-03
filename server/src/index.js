@@ -5,6 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import { ZodError } from 'zod';
 import { connectDB } from './config/db.js';
 import { ensureAdmin } from './utils/ensureAdmin.js';
 import authRoutes from './routes/auth.js';
@@ -37,7 +38,17 @@ app.use('/api/auth', authRoutes);
 app.use('/api', publicRoutes);
 app.use('/api/patient', patientRoutes);
 app.use('/api/admin', adminRoutes);
-app.use((err, req, res, next) => res.status(500).json({ message: err.message || 'Server error' }));
+app.use((err, req, res, next) => {
+  if (err instanceof ZodError) {
+    const firstIssue = err.issues?.[0];
+    return res.status(400).json({
+      message: firstIssue?.message || 'Invalid request data',
+      issues: err.issues || []
+    });
+  }
+
+  return res.status(500).json({ message: err.message || 'Server error' });
+});
 
 const port = process.env.PORT || 5000;
 connectDB()

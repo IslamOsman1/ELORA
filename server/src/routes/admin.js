@@ -866,7 +866,18 @@ router.get('/security', async (req, res) => {
 router.patch('/security', async (req, res) => {
   if (isDoctorUser(req.user)) return res.status(403).json({ message: 'Forbidden' });
 
-  const payload = adminSecuritySchema.parse(req.body || {});
+  const normalizedBody = {
+    ...req.body,
+    email: String(req.body?.email || '').trim() || undefined,
+    newPassword: String(req.body?.newPassword || '').trim() || undefined
+  };
+  const validation = adminSecuritySchema.safeParse(normalizedBody);
+  if (!validation.success) {
+    const firstIssue = validation.error.issues?.[0];
+    return res.status(400).json({ message: firstIssue?.message || 'Invalid security data' });
+  }
+
+  const payload = validation.data;
   const adminUser = await User.findById(req.user._id);
   if (!adminUser || adminUser.role !== 'admin') {
     return res.status(404).json({ message: 'Admin user not found' });
