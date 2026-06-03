@@ -5,7 +5,7 @@ export async function ensureAdmin() {
   const adminEmail = (process.env.ADMIN_EMAIL || 'admin@elora.com').toLowerCase();
   const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@12345';
 
-  const existingAdmin = await User.findOne({ email: adminEmail });
+  const existingAdmin = await User.findOne({ role: 'admin' });
   if (existingAdmin) return;
 
   await User.create({
