@@ -20,8 +20,9 @@ PORT=5000
 MONGODB_URI=mongodb://127.0.0.1:27017/elora_dental
 JWT_SECRET=replace_with_long_random_secret
 CLIENT_URL=http://localhost:5173
-ADMIN_EMAIL=admin@elora.com
-ADMIN_PASSWORD=Admin@12345
+# Used only for first-time admin bootstrap when the database has no admin yet.
+ADMIN_BOOTSTRAP_EMAIL=admin@elora.com
+ADMIN_BOOTSTRAP_PASSWORD=Admin@12345
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
@@ -58,8 +59,9 @@ This repo includes [render.yaml](./render.yaml) for the backend.
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_long_random_secret
 CLIENT_URL=https://your-vercel-domain.vercel.app
-ADMIN_EMAIL=admin@elora.com
-ADMIN_PASSWORD=your_admin_password
+# Used only for first-time admin bootstrap when the database has no admin yet.
+ADMIN_BOOTSTRAP_EMAIL=admin@elora.com
+ADMIN_BOOTSTRAP_PASSWORD=your_admin_password
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
@@ -97,4 +99,6 @@ The included `vercel.json` also rewrites all routes to `index.html`, so React Ro
 ## Admin Login
 
 - Email: `admin@elora.com`
-- Password: value from `ADMIN_PASSWORD`
+- Password: value from `ADMIN_BOOTSTRAP_PASSWORD`
+
+After the first admin is created, login credentials are taken from the database. Changing them from the dashboard does not require updating Render environment variables.

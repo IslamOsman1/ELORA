@@ -2,8 +2,8 @@ import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 
 export async function ensureAdmin() {
-  const adminEmail = (process.env.ADMIN_EMAIL || 'admin@elora.com').toLowerCase();
-  const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@12345';
+  const adminEmail = (process.env.ADMIN_BOOTSTRAP_EMAIL || process.env.ADMIN_EMAIL || 'admin@elora.com').toLowerCase();
+  const adminPassword = process.env.ADMIN_BOOTSTRAP_PASSWORD || process.env.ADMIN_PASSWORD || 'Admin@12345';
 
   const existingAdmin = await User.findOne({ role: 'admin' });
   if (existingAdmin) return;
