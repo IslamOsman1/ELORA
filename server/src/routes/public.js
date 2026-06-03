@@ -6,6 +6,7 @@ import Appointment from '../models/Appointment.js';
 import Message from '../models/Message.js';
 import TreatmentCase from '../models/TreatmentCase.js';
 import { getOrCreateSiteSettings } from '../utils/getSiteSettings.js';
+import { sendAppointmentWhatsappNotification } from '../utils/whatsapp.js';
 
 const router = express.Router();
 const appointmentSchema = z.object({
@@ -169,6 +170,14 @@ router.post('/appointments', async (req, res) => {
     }
 
     const appointment = await Appointment.create(data);
+    await appointment.populate('service doctor');
+
+    try {
+      await sendAppointmentWhatsappNotification({ appointment, settings });
+    } catch (notificationError) {
+      console.error('Failed to send booking WhatsApp notification:', notificationError.message);
+    }
+
     res.status(201).json({ message: 'Appointment booked successfully', appointment });
   } catch (error) {
     if (error.code === 11000) return res.status(409).json({ message: 'This slot is already booked' });

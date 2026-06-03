@@ -10,6 +10,7 @@ import Service from '../models/Service.js';
 import Doctor from '../models/Doctor.js';
 import { protect } from '../middleware/auth.js';
 import { getOrCreateSiteSettings } from '../utils/getSiteSettings.js';
+import { sendAppointmentWhatsappNotification } from '../utils/whatsapp.js';
 
 const router = express.Router();
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -359,10 +360,17 @@ router.post('/customer/appointments', protect('customer'), async (req, res) => {
       email: req.user.email,
       status: 'pending_review'
     });
+    await appointment.populate('service doctor');
 
     if (data.phone && req.user.phone !== data.phone) {
       req.user.phone = data.phone;
       await req.user.save();
+    }
+
+    try {
+      await sendAppointmentWhatsappNotification({ appointment, settings });
+    } catch (notificationError) {
+      console.error('Failed to send booking WhatsApp notification:', notificationError.message);
     }
 
     res.status(201).json({ message: 'Appointment booked successfully', appointment });
