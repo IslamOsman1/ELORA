@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
+import Seo from '../components/common/Seo';
 import { useLanguage } from '../context/LanguageContext';
 import { clearAdminToken } from '../utils/auth';
 import SiteSettingsPanel from '../components/admin/SiteSettingsPanel';
@@ -615,6 +616,12 @@ export default function AdminDashboardPage() {
 
   return (
     <main className="min-h-screen px-3 py-4 sm:px-4 sm:py-8">
+      <Seo
+        title={`ELORA | ${labels.dashboard}`}
+        description={labels.dashboard}
+        path="/admin"
+        noindex
+      />
       <div className="mx-auto max-w-7xl">
         <div className="mb-6 flex flex-col gap-4 sm:mb-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">

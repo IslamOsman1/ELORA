@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { BrowserCodeReader, BrowserQRCodeReader } from '@zxing/browser';
 import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import { api } from '../utils/api';
+import Seo from '../components/common/Seo';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function AdminQrVerificationPage() {
@@ -177,6 +178,12 @@ export default function AdminQrVerificationPage() {
 
   return (
     <main className="min-h-screen px-4 py-8">
+      <Seo
+        title={`ELORA | ${text.title}`}
+        description={text.subtitle}
+        path="/admin/verify"
+        noindex
+      />
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>

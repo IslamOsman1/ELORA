@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
+import Seo from '../components/common/Seo';
 import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 import { setAdminToken } from '../utils/auth';
@@ -30,6 +31,12 @@ export default function AdminLoginPage() {
 
   return (
     <main className="grid min-h-screen place-items-center px-4 py-10">
+      <Seo
+        title={`ELORA | ${t('admin.loginTitle')}`}
+        description={t('admin.loginText')}
+        path="/admin/login"
+        noindex
+      />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(244,213,154,0.2),transparent_32%),radial-gradient(circle_at_bottom,rgba(98,65,35,0.32),transparent_38%)]" />
       <form onSubmit={submit} className="premium-card relative w-full max-w-lg p-8">
         <img src="/logo.jpg" alt="ELORA" className="mx-auto h-24 w-24 rounded-3xl object-cover" />

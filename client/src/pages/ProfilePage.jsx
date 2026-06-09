@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { BadgeCheck, LogOut, Mail, QrCode, ShieldCheck, UserCircle2 } from 'lucide-react';
 import QRCode from 'qrcode';
+import Seo from '../components/common/Seo';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -53,6 +54,12 @@ export default function ProfilePage() {
 
   return (
     <main className="px-4 py-10">
+      <Seo
+        title={`ELORA | ${text.title}`}
+        description={text.subtitle}
+        path="/account"
+        noindex
+      />
       <div className="mx-auto max-w-4xl">
         <div className="premium-card overflow-hidden">
           <div className="border-b border-white/10 bg-[radial-gradient(circle_at_top,rgba(242,211,141,0.18),transparent_44%)] p-8">

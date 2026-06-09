@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { CalendarClock, CircleAlert, FileText, Search, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Navigate } from 'react-router-dom';
+import Seo from '../components/common/Seo';
 import { api } from '../utils/api';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -146,6 +147,12 @@ export default function PatientBookingsPage() {
 
   return (
     <main className="px-4 py-10">
+      <Seo
+        title={`ELORA | ${text.title}`}
+        description={text.subtitle}
+        path="/account/bookings"
+        noindex
+      />
       <div className="mx-auto max-w-7xl">
         <div className="premium-card p-6 sm:p-8">
           <p className="eyebrow">{text.title}</p>

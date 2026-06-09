@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bell, CheckCheck } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
+import Seo from '../components/common/Seo';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useNotifications } from '../context/NotificationsContext';
@@ -31,6 +32,12 @@ export default function NotificationsPage() {
 
   return (
     <main className="px-4 py-10">
+      <Seo
+        title={`ELORA | ${text.title}`}
+        description={text.subtitle}
+        path="/account/notifications"
+        noindex
+      />
       <div className="mx-auto max-w-5xl">
         <div className="premium-card p-6 sm:p-8">
           <div className="flex flex-wrap items-start justify-between gap-4">

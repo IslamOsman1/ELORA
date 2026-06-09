@@ -43,6 +43,29 @@ export default function ContactPage() {
   const locationHref = contact.locationUrl
     ? (/^https?:\/\//i.test(contact.locationUrl) ? contact.locationUrl : `https://${contact.locationUrl.replace(/^\/+/, '')}`)
     : '';
+  const socialLinks = [
+    contact.instagram ? `https://www.instagram.com/${String(contact.instagram).replace(/^@/, '')}` : null,
+    contact.facebook ? `https://www.facebook.com/${contact.facebook}` : null,
+    contact.whatsapp ? `https://wa.me/${String(contact.whatsapp).replace(/\D/g, '')}` : null
+  ].filter(Boolean);
+  const seoJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Dentist',
+    name: branding.brandName || 'ELORA',
+    url: 'https://eloradental.care/contact',
+    image: branding.logoUrl || '/logo.jpg',
+    description: heroText,
+    telephone: contact.phone || undefined,
+    email: contact.email || undefined,
+    address: contact.location ? { '@type': 'PostalAddress', streetAddress: contact.location } : undefined,
+    sameAs: socialLinks.length ? socialLinks : undefined,
+    contactPoint: (contact.phone || contact.email) ? [{
+      '@type': 'ContactPoint',
+      telephone: contact.phone || undefined,
+      email: contact.email || undefined,
+      contactType: 'customer service'
+    }] : undefined
+  };
 
   async function submit(event) {
     event.preventDefault();
@@ -62,6 +85,11 @@ export default function ContactPage() {
         description={heroText}
         image={heroImage}
         path="/contact"
+        keywords={language === 'ar'
+          ? 'تواصل مع عيادة أسنان, عنوان عيادة أسنان, رقم عيادة أسنان, حجز استشارة أسنان'
+          : 'contact dental clinic, dentist phone number, dental clinic address, book dental consultation'}
+        imageAlt={`${branding.brandName || 'ELORA'} contact page`}
+        jsonLd={seoJsonLd}
       />
       <PageHero
         eyebrow={branding.brandName || 'ELORA'}

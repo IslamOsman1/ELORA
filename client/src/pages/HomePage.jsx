@@ -71,7 +71,7 @@ function DentalHeroAnimation() {
 
 export default function HomePage() {
   const { t, language } = useLanguage();
-  const { branding, contact, getImage, getText } = useSiteSettings();
+  const { branding, contact, workingHours, getImage, getText } = useSiteSettings();
   const [services, setServices] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const showcaseImages = getImage('homeShowcaseImages', [
@@ -91,15 +91,26 @@ export default function HomePage() {
     'homeTreatedCasesCardImage',
     '/trr.png'
   );
+  const socialLinks = [
+    contact.instagram ? `https://www.instagram.com/${String(contact.instagram).replace(/^@/, '')}` : null,
+    contact.facebook ? `https://www.facebook.com/${contact.facebook}` : null,
+    contact.whatsapp ? `https://wa.me/${String(contact.whatsapp).replace(/\D/g, '')}` : null
+  ].filter(Boolean);
+  const openingHours = workingHours
+    .filter((item) => item.enabled && item.from && item.to)
+    .map((item) => `${item.labelEn} ${item.from}-${item.to}`);
   const seoJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Dentist',
     name: brandName,
+    description: homeDescription,
     image: logoUrl,
     telephone: contact.phone || undefined,
     email: contact.email || undefined,
     address: contact.location ? { '@type': 'PostalAddress', streetAddress: contact.location } : undefined,
-    url: typeof window !== 'undefined' ? window.location.origin : undefined
+    url: typeof window !== 'undefined' ? window.location.origin : 'https://eloradental.care',
+    sameAs: socialLinks.length ? socialLinks : undefined,
+    openingHours: openingHours.length ? openingHours : undefined
   };
 
   useEffect(() => {
@@ -114,6 +125,10 @@ export default function HomePage() {
         description={homeDescription}
         image={showcaseImages[0] || logoUrl}
         path="/"
+        keywords={language === 'ar'
+          ? 'عيادة أسنان, تجميل الأسنان, حجز موعد أسنان, طبيب أسنان, ابتسامة هوليود, تقويم شفاف'
+          : 'dental clinic, cosmetic dentistry, dental appointment, dentist, smile makeover, clear aligners'}
+        imageAlt={`${brandName} dental care`}
         jsonLd={seoJsonLd}
       />
       <section className="relative overflow-hidden">

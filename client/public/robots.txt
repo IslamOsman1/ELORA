@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /account
+Sitemap: https://eloradental.care/sitemap.xml
