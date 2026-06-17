@@ -44,6 +44,11 @@ const siteSettingsSchema = new mongoose.Schema({
     bookingHero: { type: String, default: '' },
     contactHero: { type: String, default: '' }
   },
+  homeStats: {
+    experienceYears: { type: String, default: '12+' },
+    treatedCases: { type: String, default: '18K+' },
+    patientRating: { type: String, default: '4.9/5' }
+  },
   copyOverrides: {
     ar: { type: mongoose.Schema.Types.Mixed, default: {} },
     en: { type: mongoose.Schema.Types.Mixed, default: {} }

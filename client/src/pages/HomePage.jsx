@@ -71,7 +71,7 @@ function DentalHeroAnimation() {
 
 export default function HomePage() {
   const { t, language } = useLanguage();
-  const { branding, contact, workingHours, getImage, getText } = useSiteSettings();
+  const { branding, contact, workingHours, homeStats, getImage, getText } = useSiteSettings();
   const [services, setServices] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const showcaseImages = getImage('homeShowcaseImages', [
@@ -86,6 +86,12 @@ export default function HomePage() {
   const homeDescription = getText(language, 'home.description', t('home.description'));
   const homeFeaturesTitle = getText(language, 'home.featuresTitle', t('home.featuresTitle'));
   const homeShowcaseText = getText(language, 'home.showcaseText', t('home.showcaseText'));
+  const statLabels = t('home.stats');
+  const homepageStats = [
+    { key: 'experienceYears', value: homeStats.experienceYears || '12+', label: statLabels[0]?.label || '' },
+    { key: 'treatedCases', value: homeStats.treatedCases || '18K+', label: statLabels[1]?.label || '' },
+    { key: 'patientRating', value: homeStats.patientRating || '4.9/5', label: statLabels[2]?.label || '' }
+  ];
   const logoUrl = branding.logoUrl || '/logo.jpg';
   const treatedCasesCardImage = getImage(
     'homeTreatedCasesCardImage',
@@ -257,8 +263,8 @@ export default function HomePage() {
         </div>
         <div className="mx-auto max-w-7xl px-4 pb-12 pt-6 sm:pb-16 sm:pt-10 md:pb-20">
           <div className="grid w-full grid-cols-3 gap-2 sm:gap-4">
-            {t('home.stats').map((stat) => (
-              <div key={stat.label} className="premium-card min-w-0 p-3 text-center sm:p-5">
+            {homepageStats.map((stat) => (
+              <div key={stat.key} className="premium-card min-w-0 p-3 text-center sm:p-5">
                 <p className="text-xl font-semibold text-[#f2d38d] sm:text-3xl">{stat.value}</p>
                 <p className="mt-1 text-[0.68rem] text-white/60 sm:mt-2 sm:text-sm">{stat.label}</p>
               </div>

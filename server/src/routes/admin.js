@@ -947,6 +947,7 @@ router.put('/site-settings', async (req, res) => {
       }))
     : current.workingHours;
   current.images = { ...current.images.toObject?.(), ...(payload.images || {}) };
+  current.homeStats = { ...current.homeStats.toObject?.(), ...(payload.homeStats || {}) };
   current.copyOverrides = {
     ar: { ...(current.copyOverrides?.ar || {}), ...(payload.copyOverrides?.ar || {}) },
     en: { ...(current.copyOverrides?.en || {}), ...(payload.copyOverrides?.en || {}) }

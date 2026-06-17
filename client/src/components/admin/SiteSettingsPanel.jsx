@@ -99,6 +99,11 @@ const groups = {
     field('صورة الواجهة 2', 'images.homeShowcaseImages.1'),
     field('صورة الواجهة 3', 'images.homeShowcaseImages.2')
   ],
+  homeStats: [
+    field('Stats 1 / Years of experience', 'homeStats.experienceYears'),
+    field('Stats 2 / Cases treated', 'homeStats.treatedCases'),
+    field('Stats 3 / Patient rating', 'homeStats.patientRating')
+  ],
   aboutImages: [
     field('صورة بانر من نحن', 'images.aboutHero'),
     field('صورة قصة العيادة', 'images.aboutStory'),
@@ -229,6 +234,12 @@ export default function SiteSettingsPanel() {
       >
         <div className="grid gap-6">
           <FieldGrid fields={groups.homeImages} form={form} setForm={setForm} />
+          <SettingsCard
+            title={isArabic ? 'إحصائيات الواجهة' : 'Homepage stats'}
+            hint={isArabic ? 'هذه القيم تظهر في البطاقات الثلاث أسفل الواجهة الرئيسية.' : 'These values appear in the three stat cards below the homepage hero.'}
+          >
+            <FieldGrid fields={groups.homeStats} form={form} setForm={setForm} />
+          </SettingsCard>
           <div className="grid gap-4 xl:grid-cols-2">
             <SettingsCard
               title={isArabic ? 'نصوص الرئيسية بالعربية' : 'Home copy in Arabic'}

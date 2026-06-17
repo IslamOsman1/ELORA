@@ -34,7 +34,8 @@ export function SiteSettingsProvider({ children }) {
     },
     branding: settings?.branding || {},
     contact: settings?.contact || {},
-    workingHours: settings?.workingHours || []
+    workingHours: settings?.workingHours || [],
+    homeStats: settings?.homeStats || {}
   }), [loading, settings]);
 
   return <SiteSettingsContext.Provider value={value}>{children}</SiteSettingsContext.Provider>;

@@ -48,6 +48,11 @@ export const defaultSiteSettings = {
     bookingHero: 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=1400&q=80',
     contactHero: 'https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1400&q=80'
   },
+  homeStats: {
+    experienceYears: '12+',
+    treatedCases: '18K+',
+    patientRating: '4.9/5'
+  },
   copyOverrides: {
     ar: {
       footer: {
