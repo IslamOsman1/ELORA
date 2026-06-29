@@ -23,6 +23,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
 import Seo from '../components/common/Seo';
+import BrandLogo from '../components/common/BrandLogo';
 import { useLanguage } from '../context/LanguageContext';
 import { clearAdminToken } from '../utils/auth';
 import SiteSettingsPanel from '../components/admin/SiteSettingsPanel';
@@ -625,7 +626,7 @@ export default function AdminDashboardPage() {
       <div className="mx-auto max-w-7xl">
         <div className="mb-6 flex flex-col gap-4 sm:mb-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
-            <img src="/logo.png" alt="ELORA" className="h-20 w-20 rounded-3xl bg-black object-contain p-1.5" />
+            <BrandLogo src="/logo.png" alt="ELORA" className="h-20 w-20 rounded-3xl bg-black object-contain p-1.5" />
             <div>
               <p className="eyebrow !mb-0">{labels.dashboard}</p>
               <h1 className="mt-2 font-display text-3xl sm:text-5xl">ELORA</h1>
@@ -1144,7 +1145,7 @@ export default function AdminDashboardPage() {
               <div className="grid gap-4">
                 {doctors.map((doctor) => (
                   <article key={doctor._id} className="grid grid-cols-[120px_1fr_auto] items-center gap-4 rounded-[2rem] border border-white/10 bg-white/[0.04] p-4">
-                    <img
+                    <BrandLogo
                       src={doctor.image || '/logo.png'}
                       alt={doctor.name}
                       className={`h-24 w-full rounded-2xl ${doctor.image ? 'object-cover' : 'bg-black object-contain p-2'}`}

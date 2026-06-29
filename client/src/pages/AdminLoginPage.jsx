@@ -3,6 +3,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import Seo from '../components/common/Seo';
+import BrandLogo from '../components/common/BrandLogo';
 import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 import { setAdminToken } from '../utils/auth';
@@ -39,7 +40,7 @@ export default function AdminLoginPage() {
       />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(244,213,154,0.2),transparent_32%),radial-gradient(circle_at_bottom,rgba(98,65,35,0.32),transparent_38%)]" />
       <form onSubmit={submit} className="premium-card relative w-full max-w-lg p-8">
-        <img src="/logo.png" alt="ELORA" className="mx-auto h-28 w-28 rounded-3xl bg-black object-contain p-2" />
+        <BrandLogo src="/logo.png" alt="ELORA" className="mx-auto h-28 w-28 rounded-3xl bg-black object-contain p-2" />
         <h1 className="mt-6 text-center font-display text-5xl">{t('admin.loginTitle')}</h1>
         <p className="mt-3 text-center text-white/60">{t('admin.loginText')}</p>
         <div className="mt-8 grid gap-4">

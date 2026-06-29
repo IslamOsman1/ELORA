@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import GoogleSignInButton from '../components/auth/GoogleSignInButton';
+import BrandLogo from '../components/common/BrandLogo';
 import Seo from '../components/common/Seo';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -149,7 +150,7 @@ export default function AuthPage() {
         <section className="relative overflow-hidden border-b border-white/10 p-8 lg:border-b-0 lg:border-e">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(242,211,141,0.18),transparent_34%),linear-gradient(160deg,rgba(255,255,255,0.02),transparent_62%)]" />
           <div className="relative">
-            <img src="/logo.png" alt="ELORA" className="h-28 w-28 rounded-[2rem] bg-black object-contain p-2 ring-1 ring-[#f2d38d]/35" />
+            <BrandLogo src="/logo.png" alt="ELORA" className="h-28 w-28 rounded-[2rem] bg-black object-contain p-2 ring-1 ring-[#f2d38d]/35" />
             <h1 className="mt-6 font-display text-5xl text-[#f2d38d]">{text.title}</h1>
             <p className="mt-4 max-w-xl text-white/68">{text.subtitle}</p>
             <div className="mt-8 grid gap-4 text-sm text-white/72">

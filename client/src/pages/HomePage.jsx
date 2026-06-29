@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { api } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
 import { useSiteSettings } from '../context/SiteSettingsContext';
+import BrandLogo from '../components/common/BrandLogo';
 import SectionHeading from '../components/common/SectionHeading';
 import Seo from '../components/common/Seo';
 import ServiceCard from '../components/public/ServiceCard';
@@ -140,7 +141,7 @@ export default function HomePage() {
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(244,213,154,0.24),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(96,54,31,0.38),transparent_35%)]" />
         <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center">
-          <img
+          <BrandLogo
             src={logoUrl}
             alt=""
             aria-hidden="true"
@@ -156,7 +157,7 @@ export default function HomePage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
                       <div className="logo-glow-wrap overflow-hidden rounded-[1.35rem] border border-[#f2d38d]/18 bg-white/[0.04] p-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.16)]">
-                        <img src={logoUrl} alt={`${brandName} logo`} className="relative z-10 h-14 w-14 rounded-[1rem] bg-black object-contain p-1" />
+                        <BrandLogo src={logoUrl} alt={`${brandName} logo`} className="relative z-10 h-14 w-14 rounded-[1rem] bg-black object-contain p-1" />
                       </div>
                       <div>
                         <p className="text-[0.68rem] uppercase tracking-[0.35em] text-[#f2d38d]">{brandName}</p>
