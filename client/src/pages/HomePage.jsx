@@ -144,7 +144,7 @@ export default function HomePage() {
             src={logoUrl}
             alt=""
             aria-hidden="true"
-            className="h-[180px] w-[180px] rounded-[2.5rem] object-cover opacity-[0.06] blur-[1px] sm:h-[260px] sm:w-[260px] sm:rounded-[3.5rem] lg:h-[420px] lg:w-[420px] lg:rounded-[5rem] lg:opacity-[0.08]"
+            className="h-[180px] w-[180px] rounded-[2.5rem] object-contain opacity-[0.06] blur-[1px] sm:h-[260px] sm:w-[260px] sm:rounded-[3.5rem] lg:h-[420px] lg:w-[420px] lg:rounded-[5rem] lg:opacity-[0.08]"
           />
         </div>
         <div className="relative z-10 mx-auto grid max-w-7xl items-start gap-5 px-4 pt-12 sm:gap-10 sm:pt-16 md:pt-20 lg:grid-cols-[1fr_.95fr]">
@@ -156,7 +156,7 @@ export default function HomePage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
                       <div className="logo-glow-wrap overflow-hidden rounded-[1.35rem] border border-[#f2d38d]/18 bg-white/[0.04] p-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.16)]">
-                        <img src={logoUrl} alt={`${brandName} logo`} className="relative z-10 h-14 w-14 rounded-[1rem] object-cover" />
+                        <img src={logoUrl} alt={`${brandName} logo`} className="relative z-10 h-14 w-14 rounded-[1rem] bg-black object-contain p-1" />
                       </div>
                       <div>
                         <p className="text-[0.68rem] uppercase tracking-[0.35em] text-[#f2d38d]">{brandName}</p>

@@ -156,7 +156,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#120f12]/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
         <Link to="/" className="flex items-center gap-3">
-          <img src={logoUrl} alt={brandName} className="h-12 w-12 rounded-2xl object-cover ring-1 ring-[#f2d38d]/40" />
+          <img src={logoUrl} alt={brandName} className="h-14 w-14 rounded-2xl bg-black object-contain p-1 ring-1 ring-[#f2d38d]/40" />
           <div>
             <p className="font-display text-2xl tracking-[0.16em] text-[#f4d59a]">{brandName}</p>
             <p className="text-xs text-white/60">{brandFull}</p>
