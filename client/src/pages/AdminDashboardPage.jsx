@@ -625,7 +625,7 @@ export default function AdminDashboardPage() {
       <div className="mx-auto max-w-7xl">
         <div className="mb-6 flex flex-col gap-4 sm:mb-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
-            <img src="/logo.jpg" alt="ELORA" className="h-16 w-16 rounded-3xl object-cover" />
+            <img src="/logo.png" alt="ELORA" className="h-16 w-16 rounded-3xl object-cover" />
             <div>
               <p className="eyebrow !mb-0">{labels.dashboard}</p>
               <h1 className="mt-2 font-display text-3xl sm:text-5xl">ELORA</h1>
@@ -1144,7 +1144,7 @@ export default function AdminDashboardPage() {
               <div className="grid gap-4">
                 {doctors.map((doctor) => (
                   <article key={doctor._id} className="grid grid-cols-[120px_1fr_auto] items-center gap-4 rounded-[2rem] border border-white/10 bg-white/[0.04] p-4">
-                    <img src={doctor.image || '/logo.jpg'} alt={doctor.name} className="h-24 w-full rounded-2xl object-cover" />
+                    <img src={doctor.image || '/logo.png'} alt={doctor.name} className="h-24 w-full rounded-2xl object-cover" />
                     <div>
                       <h3 className="text-xl font-semibold">{doctor.name}</h3>
                       <p className="text-sm text-white/45">{doctor.specialty}</p>

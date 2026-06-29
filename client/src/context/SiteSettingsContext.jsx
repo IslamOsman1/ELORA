@@ -22,21 +22,29 @@ export function SiteSettingsProvider({ children }) {
     refreshSettings().finally(() => setLoading(false));
   }, []);
 
-  const value = useMemo(() => ({
-    settings,
-    loading,
-    refreshSettings,
-    getText(language, path, fallback) {
-      return getValue(settings?.copyOverrides?.[language], path) ?? fallback;
-    },
-    getImage(path, fallback) {
-      return getValue(settings?.images, path) ?? fallback;
-    },
-    branding: settings?.branding || {},
-    contact: settings?.contact || {},
-    workingHours: settings?.workingHours || [],
-    homeStats: settings?.homeStats || {}
-  }), [loading, settings]);
+  const value = useMemo(() => {
+    const branding = { ...(settings?.branding || {}) };
+
+    if (!branding.logoUrl || branding.logoUrl === '/logo.jpg') {
+      branding.logoUrl = '/logo.png';
+    }
+
+    return {
+      settings,
+      loading,
+      refreshSettings,
+      getText(language, path, fallback) {
+        return getValue(settings?.copyOverrides?.[language], path) ?? fallback;
+      },
+      getImage(path, fallback) {
+        return getValue(settings?.images, path) ?? fallback;
+      },
+      branding,
+      contact: settings?.contact || {},
+      workingHours: settings?.workingHours || [],
+      homeStats: settings?.homeStats || {}
+    };
+  }, [loading, settings]);
 
   return <SiteSettingsContext.Provider value={value}>{children}</SiteSettingsContext.Provider>;
 }

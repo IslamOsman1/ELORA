@@ -6,7 +6,7 @@ const siteSettingsSchema = new mongoose.Schema({
     brandName: { type: String, default: 'ELORA' },
     brandFullAr: { type: String, default: '' },
     brandFullEn: { type: String, default: '' },
-    logoUrl: { type: String, default: '/logo.jpg' }
+    logoUrl: { type: String, default: '/logo.png' }
   },
   contact: {
     location: { type: String, default: '' },

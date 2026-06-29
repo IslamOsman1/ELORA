@@ -53,7 +53,7 @@ export default function ContactPage() {
     '@type': 'Dentist',
     name: branding.brandName || 'ELORA',
     url: 'https://eloradental.care/contact',
-    image: branding.logoUrl || '/logo.jpg',
+    image: branding.logoUrl || '/logo.png',
     description: heroText,
     telephone: contact.phone || undefined,
     email: contact.email || undefined,

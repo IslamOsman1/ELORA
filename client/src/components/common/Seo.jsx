@@ -77,7 +77,7 @@ function buildAbsoluteUrl(path = '/') {
 export default function Seo({
   title,
   description,
-  image = '/logo.jpg',
+  image = '/logo.png',
   path,
   type = 'website',
   noindex = false,

@@ -4,7 +4,7 @@ export const defaultSiteSettings = {
     brandName: 'ELORA',
     brandFullAr: 'إيلورا لطب الأسنان التجميلي',
     brandFullEn: 'ELORA Esthetic Dental Care',
-    logoUrl: '/logo.jpg'
+    logoUrl: '/logo.png'
   },
   contact: {
     location: 'Istanbul / Cairo',

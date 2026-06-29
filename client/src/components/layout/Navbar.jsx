@@ -17,7 +17,7 @@ export default function Navbar() {
   const { branding, getText } = useSiteSettings();
   const brandName = branding.brandName || 'ELORA';
   const brandFull = getText(language, 'common.brandFull', t('common.brandFull'));
-  const logoUrl = branding.logoUrl || '/logo.jpg';
+  const logoUrl = branding.logoUrl || '/logo.png';
 
   const links = [
     ['/', t('nav.home')],

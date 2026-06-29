@@ -92,7 +92,7 @@ export default function HomePage() {
     { key: 'treatedCases', value: homeStats.treatedCases || '18K+', label: statLabels[1]?.label || '' },
     { key: 'patientRating', value: homeStats.patientRating || '4.9/5', label: statLabels[2]?.label || '' }
   ];
-  const logoUrl = branding.logoUrl || '/logo.jpg';
+  const logoUrl = branding.logoUrl || '/logo.png';
   const treatedCasesCardImage = getImage(
     'homeTreatedCasesCardImage',
     '/trr.png'
